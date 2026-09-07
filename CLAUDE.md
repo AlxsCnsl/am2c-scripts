@@ -65,3 +65,19 @@ commanded, only the input/output state image, to avoid any accidental actuation.
 `ADAM/README.md` (in French) has more protocol detail, worked examples, and wiring
 troubleshooting notes (RS-232 vs RS-485, INIT* to GND, etc.) — read it before touching
 `protocol.py` or `serial_port.py`.
+
+## Documentation
+
+`docs/` (in French) documents the whole Python package file by file and function by
+function, for a reader who is new to serial links and to the Advantech protocol.
+`docs/README.md` is the index.
+
+**Always invoke the `documenter` subagent after making any modification to this
+repository** — a new file, a new function, a changed signature or behaviour, a new CLI
+flag, a new shell script, deleted code, a changed default. Invoke it every time,
+without judging beforehand whether the change deserves documentation: deciding that is
+the agent's job, and doing nothing is one of its valid outcomes.
+
+The agent reads the whole repository and writes only inside `docs/`. Never update
+`docs/` by hand instead of calling it — the documentation keeps one voice and one
+structure only if a single writer maintains it.
