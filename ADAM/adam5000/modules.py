@@ -23,6 +23,11 @@ IO_WORD_LENGTH = 4
 # Emplacements du fond de panier ADAM-5000, numérotés à partir de zéro.
 IO_SLOTS = 4
 
+# Références des modules dont le décodage existe ici. C'est la liste que le
+# fichier de réglages (settings.py) accepte : ajouter un modèle, c'est ajouter
+# son parse_XXXX ci-dessous puis sa référence ici.
+SUPPORTED_MODULES = ("5050", "5081")
+
 # Découpages plausibles proposés au diagnostic : au-delà, on lit du bruit.
 CANDIDATE_CHANNELS = (1, 2, 4, 8, 16)
 

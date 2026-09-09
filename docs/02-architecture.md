@@ -52,6 +52,16 @@ Retiens ces quatre règles, elles expliquent 90 % des choix du code :
 | Changer la stratégie de réessai | `monitor.py` seulement |
 | Ajouter une interrogation au diagnostic | `diagnostic.probes()` |
 
+### Un fichier à part : `settings.py`
+
+`settings.py` ([12-settings.md](12-settings.md)) ne figure pas dans le schéma
+ci-dessus : il ne lit pas le port série, seulement un fichier JSON qui décrit
+le rack (quel module dans quel slot, à quelle vitesse). Il importe des
+constantes de `modules.py`, `protocol.py` et `serial_port.py` pour valider
+contre les mêmes limites que le reste du paquet, mais aucune de leurs
+fonctions — il reste donc en dehors des quatre couches de lecture. Seul
+`cli.py` s'en sert, via `--config`.
+
 ## Le trajet complet d'une mesure
 
 Prenons `python3 -m adam5000 --port /dev/ttyUSB0 --5050 --no-checksum`.
@@ -85,21 +95,24 @@ Chaque flèche descendante est un appel, chaque flèche remontante un retour. Le
 seul endroit où le programme parle à l'extérieur (le câble) est la couche 1 ;
 le seul endroit où il parle à l'utilisateur est la couche 5.
 
-## Les cinq points d'entrée de `main()`
+## Les six points d'entrée de `main()`
 
 `cli.main()` choisit une seule branche, **et l'ordre compte** :
 
 ```python
-if args.scan:               run_scan(args)            # 1. balayage, lecture seule
-elif args.enable_checksum:  enable_checksum(args)     # 2. configuration
-elif args.raw:              show_raw(args)            # 3. une lecture brute
-elif args.io_5050:          monitor_5050_loop(args)   # 4. boucle 16 E/S
-else:                       monitor_loop(args)        # 5. boucle analogique
+if args.scan:                 run_scan(args)            # 1. balayage, lecture seule
+elif args.config is not None: show_settings(args)       # 2. lecture du fichier de réglages
+elif args.enable_checksum:    enable_checksum(args)     # 3. configuration
+elif args.raw:                show_raw(args)            # 4. une lecture brute
+elif args.io_5050:            monitor_5050_loop(args)   # 5. boucle 16 E/S
+else:                         monitor_loop(args)        # 6. boucle analogique
 ```
 
 `--scan` passe en premier volontairement : c'est le recours quand plus rien ne
 répond, et il ne doit jamais être masqué par une autre option qu'on aurait
-laissée traîner sur la ligne de commande.
+laissée traîner sur la ligne de commande. `--config` vient juste après : comme
+le balayage, il ne touche ni au port série ni au module — il ne fait que lire
+et afficher un fichier — et doit donc pouvoir être vérifié avant tout échange.
 
 ## Le vocabulaire des objets de résultat
 

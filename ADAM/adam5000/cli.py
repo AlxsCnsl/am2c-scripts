@@ -2,7 +2,7 @@
 import argparse
 import sys
 
-from . import configuration, diagnostic, protocol
+from . import configuration, diagnostic, protocol, settings
 from .modules import (
     EXPECTED_CHANNELS,
     EXPECTED_WIDTH,
@@ -212,6 +212,11 @@ def parse_args(argv=None):
     parser.add_argument("--scan-addresses", action="store_true",
                         help="avec --scan, poursuivre par les 256 adresses "
                              "possibles si rien n'a répondu")
+    parser.add_argument("--config", nargs="?", const=settings.DEFAULT_FILE,
+                        default=None, metavar="FICHIER",
+                        help="lire les réglages des slots dans ce fichier JSON "
+                             f"(défaut : {settings.DEFAULT_FILE}), les afficher, "
+                             "puis quitter ; le port série n'y figure pas")
     parser.add_argument("--raw", action="store_true",
                         help="afficher la trame brute d'une seule lecture, puis quitter "
                              "(suit --5050)")
@@ -258,6 +263,25 @@ def show_raw(args):
         print(f"  {channels} voies x {width} : "
               + " | ".join(str(int(f)) if f.isdigit() else repr(f) for f in fields)
               + repete)
+
+def show_settings(args):
+    """Affiche les réglages du rack, sans rien envoyer sur le port série."""
+    slots = settings.load(args.config)
+
+    print(f"Fichier de réglages : {args.config}")
+    print(f"{len(slots)} slot(s) décrit(s). Rien n'est envoyé sur la liaison :")
+    print("le fichier est seulement lu et contrôlé.")
+    print()
+    print("Slot | Module    | Vitesse | Checksum  | Adresse")
+
+    for item in slots:
+        etat = "activé" if item.checksum else "désactivé"
+        print(f"   {item.slot} | ADAM-{item.module} | {item.baud:>7} "
+              f"| {etat:<9} | {item.address}")
+
+    print()
+    print("Le port série reste choisi au lancement : il dépend du PC, pas du rack.")
+    print("La lecture automatique de ces slots n'est pas encore branchée.")
 
 def enable_checksum(args):
     """Envoie la trame de configuration, sans checksum, et rend compte."""
@@ -342,6 +366,10 @@ def main(argv=None):
         # répond, et il ne touche pas au module.
         if args.scan:
             run_scan(args)
+        # Vient juste après : la lecture du fichier ne touche ni au port ni au
+        # module, et doit pouvoir être contrôlée avant tout échange.
+        elif args.config is not None:
+            show_settings(args)
         elif args.enable_checksum:
             enable_checksum(args)
         elif args.raw:

@@ -21,6 +21,7 @@ mesure.
 | 9 | [09-cli.md](09-cli.md) | Couche 5 : les arguments et l'affichage |
 | 10 | [10-relecture.md](10-relecture.md) | Relecture critique : anomalies trouvées et corrections proposées |
 | 11 | [11-glossaire.md](11-glossaire.md) | Vocabulaire : baud, trame, checksum, slot, DTR… |
+| 12 | [12-settings.md](12-settings.md) | Décrire le rack dans un fichier JSON, lu par `--config` |
 
 ## En une phrase
 

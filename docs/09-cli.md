@@ -1,6 +1,6 @@
 # 9. `cli.py` — arguments et affichage
 
-Fichier : [ADAM/adam5000/cli.py](../ADAM/adam5000/cli.py) — 358 lignes, le plus
+Fichier : [ADAM/adam5000/cli.py](../ADAM/adam5000/cli.py) — 386 lignes, le plus
 gros du paquet.
 
 **Rôle :** lire la ligne de commande, choisir quoi faire, et **mettre en forme**.
@@ -181,6 +181,23 @@ Puis, selon le mode :
 C'est la commande à lancer en premier quand les valeurs affichées par la boucle
 paraissent fausses : elle ne suppose rien du format.
 
+### `show_settings(args)` — `--config [FICHIER]`
+
+```python
+slots = settings.load(args.config)
+```
+
+`--config` accepte un argument optionnel (`nargs="?"`) : sans valeur, `args.config`
+vaut `settings.DEFAULT_FILE` (`"config.json"`) grâce à `const=`, absent de la
+ligne de commande il vaut `None` — ce qui permet à `main()` de distinguer « ne
+rien faire » de « lire le fichier par défaut ».
+
+La fonction lit le fichier avec `settings.load()` ([12-settings.md](12-settings.md)),
+l'affiche en tableau (une ligne par slot), puis rend la main : **aucun octet
+n'est envoyé sur le port série**, et aucun `Monitor` n'est construit à partir
+des réglages lus — lire le rack et le surveiller restent deux actions
+séparées.
+
 ### `enable_checksum(args)` — `--enable-checksum`
 
 Enrobe `configuration.enable_checksum()` : annonce la commande envoyée, explique
@@ -247,11 +264,12 @@ depuis un futur test, au lieu de dépendre de `sys.argv`.
 ```python
 args = parse_args(argv)
 try:
-    if args.scan:               run_scan(args)
-    elif args.enable_checksum:  enable_checksum(args)
-    elif args.raw:              show_raw(args)
-    elif args.io_5050:          monitor_5050_loop(args)
-    else:                       monitor_loop(args)
+    if args.scan:                 run_scan(args)
+    elif args.config is not None: show_settings(args)
+    elif args.enable_checksum:    enable_checksum(args)
+    elif args.raw:                show_raw(args)
+    elif args.io_5050:            monitor_5050_loop(args)
+    else:                         monitor_loop(args)
 except Exception as exc:
     print(f"Erreur : {exc}", file=sys.stderr)
     return 1
@@ -262,7 +280,9 @@ Trois choses à retenir :
 
 1. **L'ordre du `if/elif` est un choix, pas un hasard.** `--scan` passe devant
    tout : c'est le recours quand plus rien ne marche, et il ne doit jamais être
-   masqué par une autre option restée sur la ligne de commande.
+   masqué par une autre option restée sur la ligne de commande. `--config`
+   vient juste après, pour la même raison : il ne touche ni au port ni au
+   module.
 2. **Le message d'erreur va sur `sys.stderr`**, pas sur la sortie standard. Ainsi
    `python3 -m adam5000 … > mesures.txt` met les mesures dans le fichier et
    laisse les erreurs à l'écran.
@@ -292,7 +312,10 @@ Il fait deux choses :
 1. **Marquer le dossier comme un paquet** (même vide, un `__init__.py` suffit).
 2. **Définir l'API publique** : réexporter les noms utiles pour qu'on puisse
    écrire `from adam5000 import Monitor` sans connaître le fichier d'origine.
-   La liste `__all__` déclare ce qui sort avec `from adam5000 import *`.
+   La liste `__all__` déclare ce qui sort avec `from adam5000 import *`. Elle
+   inclut `SlotSettings` et `load_settings` (alias de `settings.load`), pour
+   qu'un script puisse lire un fichier de réglages sans importer `settings`
+   directement.
 
-⚠️ Cette liste est incomplète et un peu datée (ni `Monitor5050`, ni
-`parse_5050`, ni `diagnostic`) : voir la [relecture](10-relecture.md).
+⚠️ Cette liste reste incomplète (ni `Monitor5050`, ni `parse_5050`, ni
+`diagnostic`) : voir la [relecture](10-relecture.md).

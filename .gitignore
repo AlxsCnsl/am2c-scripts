@@ -1,0 +1,23 @@
+# Python (le paquet ADAM/adam5000 est lancé directement, jamais installé)
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+*.egg-info/
+
+# Éditeurs et outils
+.vscode/
+.idea/
+.claude/settings.local.json
+*.swp
+*~
+
+# Système
+.DS_Store
+Thumbs.db
+
+# Sorties locales (relevés série, journaux de diagnostic)
+*.log
+*.tmp

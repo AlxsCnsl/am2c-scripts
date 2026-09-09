@@ -118,6 +118,7 @@ détaillées dans [09-cli.md](09-cli.md).
 | `--width` | `10` | Largeur d'un champ analogique, en caractères |
 | `--scan` | absent | Balayer les réglages possibles, puis quitter (lecture seule) |
 | `--scan-addresses` | absent | Avec `--scan`, essayer aussi les 256 adresses |
+| `--config` | absent (`config.json` si présent sans valeur) | Lire, valider et afficher un fichier de réglages des slots, puis quitter |
 | `--raw` | absent | Une seule lecture, trame brute affichée, puis quitter |
 
 ## Pas de tests, pas de linter

@@ -1,9 +1,9 @@
 # 10. Relecture critique du code Python
 
-Relecture des 9 fichiers du paquet `adam5000`, faite le 2026-09-07. Les
-constats sont classés par gravité. Chaque anomalie est reproduite ou tracée
-jusqu'à la ligne concernée ; **aucune correction n'a été appliquée** — ce
-document propose, il ne modifie pas.
+Relecture des fichiers Python du paquet `adam5000`. Les constats sont classés
+par gravité. Chaque anomalie est reproduite ou tracée jusqu'à la ligne
+concernée ; **aucune correction n'a été appliquée** — ce document propose, il
+ne modifie pas.
 
 ## Impression générale
 
@@ -19,7 +19,7 @@ sont réelles mais mineures ; aucune ne remet en cause la conception.
 ## 1. `parse_5050()` confond un mot d'état avec l'adresse
 
 **Gravité : moyenne — bogue reproductible**
-[modules.py:54](../ADAM/adam5000/modules.py#L54)
+[modules.py:59](../ADAM/adam5000/modules.py#L59)
 
 ```python
 if payload.upper().startswith(address.upper()):
@@ -178,7 +178,7 @@ else:
 ## 5. `except Exception` masque la trace en cas de bogue
 
 **Gravité : faible — gêne la mise au point**
-[cli.py:354](../ADAM/adam5000/cli.py#L354)
+[cli.py:382](../ADAM/adam5000/cli.py#L382)
 
 ```python
 except Exception as exc:
@@ -206,7 +206,7 @@ except Exception as exc:
 Accessoirement, `Ctrl+C` pendant `--scan` ou `--raw` produit aujourd'hui une
 trace `KeyboardInterrupt` (seules les deux boucles de mesure la rattrapent).
 Ajouter `except KeyboardInterrupt: print("\nInterrompu."); return 130` dans
-`main()` traiterait les cinq branches d'un coup (130 est le code de retour
+`main()` traiterait les six branches d'un coup (130 est le code de retour
 conventionnel pour une interruption).
 
 ---
@@ -269,7 +269,7 @@ Sans conséquence, mais à savoir :
   commentaire qui dit ce qui a été observé.
 
 - **`show_raw()` ne vide pas le tampon d'entrée.**
-  [cli.py:231](../ADAM/adam5000/cli.py#L231) — `configuration.send_once()` ouvre
+  [cli.py:236](../ADAM/adam5000/cli.py#L236) — `configuration.send_once()` ouvre
   le port et lit aussitôt. Un reliquat d'une exécution précédente pourrait être
   pris pour la réponse. Un `flush_input()` après ouverture, comme le fait
   `diagnostic.attempt()`, fiabiliserait l'outil de mise au point.

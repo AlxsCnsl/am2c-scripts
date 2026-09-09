@@ -1,6 +1,6 @@
 # 5. `modules.py` — le décodage des valeurs
 
-Fichier : [ADAM/adam5000/modules.py](../ADAM/adam5000/modules.py) — 82 lignes.
+Fichier : [ADAM/adam5000/modules.py](../ADAM/adam5000/modules.py) — 87 lignes.
 
 **Rôle :** transformer une charge utile (déjà validée par `verify_frame()`) en
 liste de valeurs de voies. Une fonction par module d'E/S.
@@ -22,8 +22,15 @@ EXPECTED_WIDTH = 10        # caractères par voie analogique
 IO_CHANNELS = 16           # voies tout ou rien de l'ADAM-5050
 IO_WORD_LENGTH = 4         # 4 chiffres hexadécimaux = 16 bits
 IO_SLOTS = 4               # emplacements du fond de panier, numérotés 0 à 3
+SUPPORTED_MODULES = ("5050", "5081")    # références dont le décodage existe ici
 CANDIDATE_CHANNELS = (1, 2, 4, 8, 16)   # découpages plausibles, pour --raw
 ```
+
+`SUPPORTED_MODULES` liste les références dont une fonction `parse_*` existe
+plus bas dans ce fichier. C'est la même liste que `settings.py`
+([12-settings.md](12-settings.md)) utilise pour valider le champ `module` d'un
+fichier de réglages : ajouter un modèle ici, c'est aussi le rendre acceptable
+dans le fichier JSON, sans toucher à `settings.py`.
 
 Le commentaire du fichier insiste sur un point : `EXPECTED_CHANNELS` et
 `EXPECTED_WIDTH` sont des **hypothèses sur le module câblé**, pas des vérités.
