@@ -15,7 +15,7 @@ nouvel arbitrage : les seules cases qui attendent une main humaine sont marquée
 
 | Étape | État | Fait |
 |---|---|---|
-| 1 — Poser le filet de tests | à faire | 0/6 |
+| 1 — Poser le filet de tests | faite | 6/6 |
 | 2 — Renommage `dcon` / `serie/` | à faire | 0/6 |
 | 3 — Rendre `protocol.py` générique | à faire | 0/4 |
 | 4 — Familles et registre de modules | à faire | 0/11 |
@@ -106,23 +106,23 @@ pas faite ; ils deviennent `serie/dcon/` ensuite.
 **Avant toute modification.** Sans matériel branché en permanence, c'est le seul
 moyen de refactorer sans casser un décodage en silence.
 
-- [ ] Créer `ADAM/tests/`, lancé par `python3 -m unittest discover tests` depuis
+- [x] Créer `ADAM/tests/`, lancé par `python3 -m unittest discover tests` depuis
       `ADAM/` (même contrainte de répertoire que le paquet). Le dossier suit le
       renommage à l'étape 2.
-- [ ] `test_protocol.py` : `checksum_ascii` sur des trames connues, `build_frame`
+- [x] `test_protocol.py` : `checksum_ascii` sur des trames connues, `build_frame`
       avec et sans checksum, `verify_frame` (checksum juste/fausse, réponse trop
       courte, accusé `>` contre `!`, refus `?`).
-- [ ] `test_modules.py` : `parse_5081` (longueur exacte, longueur fausse, non
+- [x] `test_modules.py` : `parse_5081` (longueur exacte, longueur fausse, non
       numérique), `parse_5050` (bit 0 = voie 0, mot `0000`, `FFFF`, minuscules,
       adresse réémise ou non), `possible_layouts`.
-- [ ] `test_settings.py` : document valide, clé inconnue, clé manquante, slot en
+- [x] `test_settings.py` : document valide, clé inconnue, clé manquante, slot en
       double, slot hors bornes, `true` refusé comme slot, vitesse inconnue,
       module inconnu, adresse invalide.
-- [ ] Figer les comportements **actuels**, y compris ceux qui seront corrigés à
+- [x] Figer les comportements **actuels**, y compris ceux qui seront corrigés à
       l'étape 9 : le test change alors en même temps que le code, et on voit ce
       qui bouge.
 
-- [ ] **Fin d'étape :** la suite passe en vert sur le code inchangé.
+- [x] **Fin d'étape :** la suite passe en vert sur le code inchangé.
 
 ---
 

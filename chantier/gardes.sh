@@ -10,6 +10,8 @@
 # jamais la relancer. Aucune valeur écrite par une IA n'ouvre cette porte.
 
 set -u
+set -f   # pas de développement des motifs contre le disque :
+         # « @PAQ@/*.py » doit rester un motif, pas devenir une liste.
 RACINE=$(cd "$(dirname "$0")/.." && pwd)
 cd "$RACINE" || exit 1
 
@@ -35,7 +37,7 @@ LIGNE=$(sed -n "s/^$ETAPE|//p" chantier/etapes.conf)
 [ -n "$LIGNE" ] || { refus "étape $ETAPE absente de chantier/etapes.conf"; exit 1; }
 MOTIFS=$(printf '%s' "$LIGNE" | cut -d'|' -f1 | sed "s|@PAQ@|$PAQ|g; s|@BASE@|$BASE|g")
 # Sorties que tout agent doit pouvoir écrire, à toutes les étapes.
-MOTIFS="$MOTIFS chantier/etat.env chantier/traces/* chantier/JOURNAL.md chantier/cliquet-tests TODO.md TODO/*"
+MOTIFS="$MOTIFS chantier/etape-courante chantier/etat.env chantier/traces/* chantier/JOURNAL.md chantier/cliquet-tests TODO.md TODO/*"
 
 # --- 1. Périmètre -----------------------------------------------------------
 # Constat après coup. La prévention, elle, est dans le hook PreToolUse.
@@ -110,7 +112,7 @@ else
 fi
 
 # I6 — aucune dépendance externe. Liste blanche du standard utilisé ici.
-STD="argparse collections datetime enum fcntl json os pathlib re select struct sys termios time typing unittest dataclasses itertools math"
+STD="$(basename "$PAQ") argparse collections datetime enum fcntl json os pathlib re select struct sys termios time typing unittest dataclasses itertools math"
 ETRANGERS=""
 for mod in $(grep -rhE '^\s*(import|from) [a-zA-Z]' $(find "$PAQ" "$BASE/tests" -name '*.py' 2>/dev/null) 2>/dev/null \
         | sed -E 's/^\s*(import|from) ([a-zA-Z_][a-zA-Z0-9_]*).*/\2/' | sort -u); do

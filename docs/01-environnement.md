@@ -121,9 +121,35 @@ détaillées dans [09-cli.md](09-cli.md).
 | `--config` | absent (`config.json` si présent sans valeur) | Lire, valider et afficher un fichier de réglages des slots, puis quitter |
 | `--raw` | absent | Une seule lecture, trame brute affichée, puis quitter |
 
-## Pas de tests, pas de linter
+## Les tests automatisés
 
-Il n'y a ni suite de tests, ni `pytest`, ni `ruff`/`flake8`, ni formateur
-configuré. Le code se vérifie donc à la main, contre du matériel réel — d'où
-l'importance de `--raw` et `--scan`, qui sont les seuls « outils de test » du
-dépôt.
+`ADAM/tests/` contient une suite de tests unitaires, écrite avec `unittest` de
+la bibliothèque standard — aucune dépendance externe, donc rien à installer ici
+non plus. Elle se lance avec la même contrainte de répertoire que le paquet
+lui-même :
+
+```sh
+cd ADAM
+python3 -m unittest discover tests
+```
+
+Ces tests portent uniquement sur les couches qui ne touchent ni au port série
+ni au disque — des fonctions pures qu'on peut appeler directement sans
+matériel :
+
+| Fichier | Couche testée | Ce qu'il vérifie |
+|---|---|---|
+| `test_protocol.py` | [`protocol.py`](04-protocol.md) | `checksum_ascii`, `build_frame`, les constructeurs de commande (`read_command`, `digital_read_command`, `build_command`), `verify_frame` |
+| `test_modules.py` | [`modules.py`](05-modules.md) | `parse_5081`, `parse_5050`, `possible_layouts`, et les constantes du module |
+| `test_settings.py` | [`settings.py`](12-settings.md) | `parse()` (document déjà décodé) et `load()` (lecture du fichier, y compris son absence) |
+
+`test_modules.py` fige notamment le défaut d'adresse de `parse_5050()` décrit
+dans [10-relecture.md](10-relecture.md#1-parse_5050-confond-un-mot-détat-avec-ladresse) :
+un mot d'état qui commence par les mêmes chiffres que l'adresse de station se
+fait amputer de ses deux premiers caractères, exactement comme aujourd'hui.
+
+`serial_port.py`, `monitor.py`, `diagnostic.py` et `cli.py` restent en dehors
+de cette suite : ils ont besoin d'un port série réel (ou d'un remplaçant) pour
+être exercés, ce que la suite actuelle ne fournit pas. Il n'y a par ailleurs
+ni `pytest`, ni `ruff`/`flake8`, ni formateur configuré — `--raw` et `--scan`
+restent les seuls moyens de vérifier le comportement contre du matériel réel.
