@@ -3,7 +3,7 @@ SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 
 echo "ADAM-5000 / ADAM-5081 / ADAM-5050"
 echo
-echo "1 - Lecture continue temporisée des voies analogiques"
+echo "1 - Lecture continue temporisée d'un module ADAM-5081"
 echo "2 - Visualiser les 16 entrées/sorties d'un module ADAM-5050"
 echo "3 - Activer le checksum du module"
 printf "Choix [1-3] : "
