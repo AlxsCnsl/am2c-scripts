@@ -171,9 +171,12 @@ fi
 # --- 6. Critère propre à l'étape --------------------------------------------
 case "$ETAPE" in
 2)
-    grep -rq 'adam5000' --include='*.py' --include='*.sh' --include='*.md' . 2>/dev/null \
-        && refus "le nom « adam5000 » subsiste quelque part" \
-        || ok "plus aucune trace du nom adam5000"
+    # chantier/ et TODO* décrivent la migration : ils citent forcément les deux
+    # noms, et les gardes elles-mêmes doivent détecter l'avant comme l'après.
+    RESTES=$(grep -rl 'adam5000' --include='*.py' --include='*.sh' --include='*.md' . 2>/dev/null \
+        | grep -v '^\./chantier/' | grep -v '^\./TODO' | grep -v 'perimetre-garde\.py$' || true)
+    [ -n "$RESTES" ] && { refus "le nom « adam5000 » subsiste :"; printf '%s\n' "$RESTES" | sed 's/^/        /'; } \
+                     || ok "plus aucune trace du nom adam5000 hors des fichiers de migration"
     ;;
 3)
     grep -qi 'slot\|5050\|5081' "$PAQ/protocol.py" 2>/dev/null \

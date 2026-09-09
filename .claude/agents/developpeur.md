@@ -59,7 +59,7 @@ plan costs him the run.
 Small steps, verified as you go. After each meaningful change:
 
 ```
-cd <ADAM|serie> && python3 -m unittest discover -s tests -q
+cd serie && python3 -m unittest discover -s tests -q
 ```
 
 The suite must be green when you hand back. If a test goes red because the

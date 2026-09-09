@@ -50,7 +50,7 @@ if [ "$action" = "3" ]; then
 
   case "$rep" in
     o|O)
-      $USE_SUDO python3 -m adam5000 \
+      $USE_SUDO python3 -m dcon \
         --port "$PORT" \
         --baud "$BAUD" \
         --enable-checksum \
@@ -102,7 +102,7 @@ printf "Délai avant nouvelle tentative en secondes [0.5] : "
 read retrydelay
 [ -z "$retrydelay" ] && retrydelay="0.5"
 
-$USE_SUDO python3 -m adam5000 \
+$USE_SUDO python3 -m dcon \
   --port "$PORT" \
   --baud "$BAUD" \
   --interval "$inter" \

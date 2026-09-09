@@ -28,8 +28,8 @@ from .modules import IO_SLOTS, SUPPORTED_MODULES
 from .protocol import DEFAULT_ADDRESS
 from .serial_port import BAUDRATES
 
-# Cherché dans le répertoire courant, c'est-à-dire ADAM/ puisque le paquet se
-# lance par `python3 -m adam5000` depuis ce dossier.
+# Cherché dans le répertoire courant, c'est-à-dire serie/ puisque le paquet se
+# lance par `python3 -m dcon` depuis ce dossier.
 DEFAULT_FILE = "config.json"
 
 REQUIRED_KEYS = ("slot", "module", "vitesse", "checksum")

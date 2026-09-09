@@ -6,7 +6,7 @@ sur read_command et digital_read_command déménageront alors avec eux.
 """
 import unittest
 
-from adam5000 import protocol
+from dcon import protocol
 
 
 class ChecksumAscii(unittest.TestCase):

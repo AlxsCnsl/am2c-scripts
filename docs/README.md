@@ -1,4 +1,4 @@
-# Documentation du paquet `adam5000`
+# Documentation du paquet `dcon`
 
 Documentation de lecture destinée à quelqu'un qui découvre le dépôt : elle
 explique **ce que fait chaque fichier, chaque fonction, et pourquoi**. Aucune
@@ -32,12 +32,12 @@ de voies, et l'affiche — en boucle.
 
 ## Rappel important
 
-Le paquet se lance **toujours** avec `-m`, depuis le dossier `ADAM/` :
+Le paquet se lance **toujours** avec `-m`, depuis le dossier `serie/` :
 
 ```sh
-cd ADAM
-python3 -m adam5000 --port /dev/ttyUSB0
+cd serie
+python3 -m dcon --port /dev/ttyUSB0
 ```
 
-`python3 adam5000/__main__.py` échoue (« attempted relative import with no
+`python3 dcon/__main__.py` échoue (« attempted relative import with no
 known parent package »), voir [01-environnement.md](01-environnement.md).

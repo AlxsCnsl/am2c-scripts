@@ -1,6 +1,6 @@
 # 4. `protocol.py` — la grammaire des trames
 
-Fichier : [ADAM/adam5000/protocol.py](../ADAM/adam5000/protocol.py) — 75 lignes.
+Fichier : [serie/dcon/protocol.py](../serie/dcon/protocol.py) — 75 lignes.
 
 **Rôle :** fabriquer les chaînes à envoyer, et vérifier celles qui reviennent.
 Ce fichier ne fait **aucune entrée/sortie** : il ne manipule que des chaînes de

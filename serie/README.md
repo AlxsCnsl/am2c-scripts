@@ -11,7 +11,7 @@ tout ou rien).
 lancer_adam.sh            lanceur interactif (action, port, droits, cadence)
 lancer_diagnostic.sh      lanceur du balayage, quand le module reste muet
 choisir_port.sh           choix du port et des droits, inclus par les deux
-adam5000/                 paquet Python
+dcon/                     paquet Python
 ├── serial_port.py        transport : termios, 8N1, vitesse, lecture de trame
 ├── protocol.py           trames ASCII Advantech : checksum, requête, accusé
 ├── modules.py            décodage par module d'E/S (ADAM-5081, ADAM-5050)
@@ -19,7 +19,7 @@ adam5000/                 paquet Python
 ├── configuration.py      commandes ponctuelles : activation du checksum
 ├── diagnostic.py         balayage vitesse / checksum / adresse, en lecture seule
 ├── cli.py                arguments et mise en forme de l'affichage
-└── __main__.py           python3 -m adam5000
+└── __main__.py           python3 -m dcon
 ```
 
 Les quatre couches sont indépendantes : ajouter le support d'un autre module
@@ -28,11 +28,11 @@ ne touche que `cli.py`.
 
 ## Lancement
 
-Depuis ce dossier (`ADAM/`) :
+Depuis ce dossier (`serie/`) :
 
 ```sh
 sh lancer_adam.sh                                     # interactif
-python3 -m adam5000 --port /dev/ttyUSB0 --interval 2  # direct
+python3 -m dcon --port /dev/ttyUSB0 --interval 2  # direct
 ```
 
 Options : `--port`, `--baud`, `--interval`, `--retries`, `--retry-delay`,
@@ -51,7 +51,7 @@ ne dit lequel des trois est en cause — d'où le balayage :
 
 ```sh
 sh lancer_diagnostic.sh                        # interactif
-python3 -m adam5000 --port /dev/ttyUSB0 --scan # direct
+python3 -m dcon --port /dev/ttyUSB0 --scan # direct
 ```
 
 Il essaie chaque vitesse avec et sans checksum, interroge le nom du module,
@@ -70,13 +70,13 @@ commune, alimentation du châssis, et selon le modèle INIT* relié à GND.
 Pour une seule requête et sa trame brute, `--raw` suffit :
 
 ```sh
-python3 -m adam5000 --port /dev/ttyUSB0 --baud 9600 --5050 --raw --no-checksum
+python3 -m dcon --port /dev/ttyUSB0 --baud 9600 --5050 --raw --no-checksum
 ```
 
 ## Module ADAM-5050 : 16 entrées/sorties
 
 ```sh
-python3 -m adam5000 --port /dev/ttyUSB0 --5050 --slot 0 --interval 1
+python3 -m dcon --port /dev/ttyUSB0 --5050 --slot 0 --interval 1
 ```
 
 La vue est redessinée à chaque cycle : une voie à 1 s'affiche en vert, une
@@ -102,13 +102,13 @@ n'en attend pas, et l'inverse fait échouer le décodage. Le lanceur pose donc
 la question, et `--no-checksum` la reporte en ligne de commande :
 
 ```sh
-python3 -m adam5000 --port /dev/ttyUSB0 --no-checksum   # module sans checksum
+python3 -m dcon --port /dev/ttyUSB0 --no-checksum   # module sans checksum
 ```
 
 Pour l'activer sur un module qui en est dépourvu (choix 3 du lanceur) :
 
 ```sh
-python3 -m adam5000 --port /dev/ttyUSB0 --enable-checksum
+python3 -m dcon --port /dev/ttyUSB0 --enable-checksum
 ```
 
 La trame envoyée est `%01000840` — adresse 01, 38400 bauds, bit checksum à 1 —
@@ -117,10 +117,10 @@ pas encore. Le module répond `!01` s'il accepte, `?01` s'il refuse.
 `--config-command` permet de fournir une autre trame si l'adresse ou la vitesse
 diffèrent. Selon le modèle, INIT* peut devoir être relié à GND.
 
-L'option `-m` est obligatoire : `python3 adam5000/` et
-`python3 adam5000/__main__.py` échouent sur `attempted relative import with no
+L'option `-m` est obligatoire : `python3 dcon/` et
+`python3 dcon/__main__.py` échouent sur `attempted relative import with no
 known parent package`, car Python charge alors `__main__.py` sans package
-parent. Seul `-m adam5000` définit le paquet.
+parent. Seul `-m dcon` définit le paquet.
 
 L'accès au port série demande d'appartenir au groupe `dialout` ; le lanceur
 propose de le configurer.

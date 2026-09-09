@@ -1,6 +1,6 @@
 # 8. `diagnostic.py` — le balayage quand rien ne répond
 
-Fichier : [ADAM/adam5000/diagnostic.py](../ADAM/adam5000/diagnostic.py) — 124 lignes.
+Fichier : [serie/dcon/diagnostic.py](../serie/dcon/diagnostic.py) — 124 lignes.
 
 **Rôle :** trouver les réglages du module quand il reste muet. **En lecture
 seule** : uniquement des interrogations, jamais de commande de configuration.
@@ -190,9 +190,9 @@ universelle, celle à laquelle tout ADAM répond quel que soit son équipement.
 ## Comment on s'en sert
 
 ```sh
-sh ADAM/lancer_diagnostic.sh                          # interactif
-python3 -m adam5000 --port /dev/ttyUSB0 --scan        # direct
-python3 -m adam5000 --port /dev/ttyUSB0 --scan --scan-addresses
+sh serie/lancer_diagnostic.sh                          # interactif
+python3 -m dcon --port /dev/ttyUSB0 --scan        # direct
+python3 -m dcon --port /dev/ttyUSB0 --scan --scan-addresses
 ```
 
 Si le balayage complet reste muet de bout en bout, la cause n'est plus dans les

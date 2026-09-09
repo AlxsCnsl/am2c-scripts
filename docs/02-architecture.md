@@ -64,7 +64,7 @@ fonctions — il reste donc en dehors des quatre couches de lecture. Seul
 
 ## Le trajet complet d'une mesure
 
-Prenons `python3 -m adam5000 --port /dev/ttyUSB0 --5050 --no-checksum`.
+Prenons `python3 -m dcon --port /dev/ttyUSB0 --5050 --no-checksum`.
 
 ```
 __main__.py

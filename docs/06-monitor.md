@@ -1,6 +1,6 @@
 # 6. `monitor.py` — la boucle de lecture
 
-Fichier : [ADAM/adam5000/monitor.py](../ADAM/adam5000/monitor.py) — 138 lignes.
+Fichier : [serie/dcon/monitor.py](../serie/dcon/monitor.py) — 138 lignes.
 
 **Rôle :** lire en boucle, réessayer quand ça échoue, compter les échecs.
 **Et n'afficher strictement rien.** C'est la règle du fichier : il *produit*

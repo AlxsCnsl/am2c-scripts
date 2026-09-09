@@ -71,7 +71,7 @@ The rule holds even for a one-line change: a modified default value in
 
 1. **You write only inside `docs/`.** Every `Write` and `Edit` must target a path
    under `docs/`. Never touch source files, `CLAUDE.md`, the root `README.md`,
-   `ADAM/README.md`, shell scripts, or anything under `.claude/`. If a doc cannot
+   `serie/README.md`, shell scripts, or anything under `.claude/`. If a doc cannot
    be made correct without a code change, say so in your report and leave both
    alone.
 2. **You read anywhere.** Inspect the repository yourself rather than trusting a
@@ -176,7 +176,7 @@ grep -rn "<name of every changed function, constant, flag>" docs/
 ```
 
 Fix every hit that is now wrong. Then re-check the line-number links
-(`(../ADAM/adam5000/modules.py#L54)`) pointing into any file you touched — line
+(`(../serie/dcon/modules.py#L54)`) pointing into any file you touched — line
 numbers drift the moment code moves above them. Correct each number, or drop the
 line anchor and keep the file link.
 
@@ -186,7 +186,7 @@ Anything you assert about behaviour must be something you checked, never
 something you inferred from a name.
 
 - Pure functions: run them.
-  `cd ADAM && python3 -c "from adam5000 import modules; print(modules.parse_5050('01FF00'))"`
+  `cd serie && python3 -c "from dcon import modules; print(modules.parse_5050('01FF00'))"`
 - Constants, defaults, signatures: read them in the source.
 - Anything needing the serial hardware: **you cannot test it.** `/dev/ttyUSB0` is
   not openable from this session. Describe what the code does, and say in your
@@ -202,14 +202,14 @@ explicitly marked as illustrative.
 **One source file, one doc file.** That is the rule; keep it visible.
 
 ```
-docs/03-serial_port.md   ↔  ADAM/adam5000/serial_port.py
-docs/04-protocol.md      ↔  ADAM/adam5000/protocol.py
-docs/05-modules.md       ↔  ADAM/adam5000/modules.py
-docs/06-monitor.md       ↔  ADAM/adam5000/monitor.py
-docs/07-configuration.md ↔  ADAM/adam5000/configuration.py
-docs/08-diagnostic.md    ↔  ADAM/adam5000/diagnostic.py
-docs/09-cli.md           ↔  ADAM/adam5000/cli.py  (+ __main__.py, __init__.py)
-docs/12-settings.md      ↔  ADAM/adam5000/settings.py
+docs/03-serial_port.md   ↔  serie/dcon/serial_port.py
+docs/04-protocol.md      ↔  serie/dcon/protocol.py
+docs/05-modules.md       ↔  serie/dcon/modules.py
+docs/06-monitor.md       ↔  serie/dcon/monitor.py
+docs/07-configuration.md ↔  serie/dcon/configuration.py
+docs/08-diagnostic.md    ↔  serie/dcon/diagnostic.py
+docs/09-cli.md           ↔  serie/dcon/cli.py  (+ __main__.py, __init__.py)
+docs/12-settings.md      ↔  serie/dcon/settings.py
 ```
 
 Plus four cross-cutting files, which are the only exceptions and must stay
@@ -273,7 +273,7 @@ Match the existing files:
   that matter, explain them.
 - **Tables for anything enumerable**: flags, constants, layer responsibilities,
   namedtuple fields.
-- **Relative markdown links to source**: `[modules.py:54](../ADAM/adam5000/modules.py#L54)`.
+- **Relative markdown links to source**: `[modules.py:54](../serie/dcon/modules.py#L54)`.
 - **⚠️ for traps**, rare enough that it still means something.
 - **Name the assumptions.** Where the code guesses about the wired hardware — the
   analog channel count and field width are hypotheses, not facts — the

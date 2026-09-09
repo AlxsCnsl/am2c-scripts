@@ -47,7 +47,7 @@ yourself:
 ```
 git diff HEAD~1 --stat          what actually landed
 grep -rn "<the thing>" <paths>   does it exist, does it still exist elsewhere
-cd <ADAM|serie> && python3 -m unittest discover -s tests -q
+cd serie && python3 -m unittest discover -s tests -q
 wc -l <file>                     for the size criteria
 sh chantier/gardes.sh <N>        the mechanical criteria, already written
 ```

@@ -1,6 +1,6 @@
 # 12. `settings.py` — décrire le rack dans un fichier
 
-Fichier : [ADAM/adam5000/settings.py](../ADAM/adam5000/settings.py) — 176 lignes.
+Fichier : [serie/dcon/settings.py](../serie/dcon/settings.py) — 176 lignes.
 
 **Rôle :** lire un fichier JSON qui décrit ce qui est enfiché dans le fond de
 panier — un bloc par slot — le valider, et rendre une liste de `SlotSettings`.
@@ -31,7 +31,7 @@ choisis au lancement par `choisir_port.sh`. Le fichier ne décrit que ce qui ne
 bouge pas d'un PC à l'autre : quel module est enfiché où, à quelle vitesse il
 parle, et s'il attend une somme de contrôle.
 
-Un exemple concret vit dans [ADAM/config.json](../ADAM/config.json).
+Un exemple concret vit dans [serie/config.json](../serie/config.json).
 
 ## Le type de résultat
 
@@ -58,7 +58,7 @@ return parse(document)
 ```
 
 `DEFAULT_FILE = "config.json"`, cherché dans le répertoire courant — c'est-à-
-dire `ADAM/`, puisque le paquet se lance avec `python3 -m adam5000` depuis ce
+dire `serie/`, puisque le paquet se lance avec `python3 -m dcon` depuis ce
 dossier (voir [01-environnement.md](01-environnement.md)).
 
 Les deux erreurs possibles à l'ouverture (fichier absent, JSON mal formé) sont
@@ -139,7 +139,7 @@ if reference not in SUPPORTED_MODULES:
 
 `5050`, `"5050"` et `"ADAM-5050"` sont tous les trois acceptés et rendent la
 même chaîne `"5050"`. `SUPPORTED_MODULES = ("5050", "5081")` — définie dans
-[modules.py](../ADAM/adam5000/modules.py), voir
+[modules.py](../serie/dcon/modules.py), voir
 [05-modules.md](05-modules.md) — est la même liste que celle des fonctions
 `parse_*` réellement écrites : ajouter un modèle, c'est ajouter son
 décodage dans `modules.py` puis sa référence dans `SUPPORTED_MODULES`, ce qui
@@ -167,7 +167,7 @@ tableau, puis quitte — **rien n'est envoyé sur le port série**. Aucun
 lancer une lecture dessus sont deux actions séparées.
 
 ```
-$ python3 -m adam5000 --config config.json
+$ python3 -m dcon --config config.json
 Fichier de réglages : config.json
 2 slot(s) décrit(s). Rien n'est envoyé sur la liaison :
 le fichier est seulement lu et contrôlé.
@@ -180,4 +180,4 @@ Le port série reste choisi au lancement : il dépend du PC, pas du rack.
 La lecture automatique de ces slots n'est pas encore branchée.
 ```
 
-(Sortie réelle, obtenue avec [ADAM/config.json](../ADAM/config.json).)
+(Sortie réelle, obtenue avec [serie/config.json](../serie/config.json).)

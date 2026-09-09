@@ -69,7 +69,7 @@ def suggest_command(port, trouvailles):
     if retenu.slot is not None:
         options += ["--5050", f"--slot {retenu.slot}"]
 
-    return "python3 -m adam5000 " + " ".join(options)
+    return "python3 -m dcon " + " ".join(options)
 
 def run_scan(args):
     """Balaie les réglages possibles et rapporte ce qui a répondu."""

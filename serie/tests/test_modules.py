@@ -6,7 +6,7 @@ passera, ce sont eux qui changeront, et le diff dira exactement ce qui a bougé.
 """
 import unittest
 
-from adam5000 import modules
+from dcon import modules
 
 
 class Constantes(unittest.TestCase):

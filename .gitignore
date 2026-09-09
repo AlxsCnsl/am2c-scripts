@@ -1,4 +1,4 @@
-# Python (le paquet ADAM/adam5000 est lancé directement, jamais installé)
+# Python (le paquet serie/dcon est lancé directement, jamais installé)
 __pycache__/
 *.py[cod]
 *$py.class
@@ -21,3 +21,6 @@ Thumbs.db
 # Sorties locales (relevés série, journaux de diagnostic)
 *.log
 *.tmp
+
+# Les traces du chantier sont des pièces, pas des sorties jetables.
+!chantier/traces/*.log

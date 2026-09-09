@@ -1,6 +1,6 @@
 # 7. `configuration.py` — les commandes ponctuelles
 
-Fichier : [ADAM/adam5000/configuration.py](../ADAM/adam5000/configuration.py) — 27 lignes.
+Fichier : [serie/dcon/configuration.py](../serie/dcon/configuration.py) — 27 lignes.
 
 **Rôle :** envoyer une seule trame, lire une seule réponse. Pas de boucle, pas
 de réessai, pas de statistiques.

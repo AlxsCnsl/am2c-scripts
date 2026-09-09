@@ -7,7 +7,7 @@ resteront donc valides.
 """
 import unittest
 
-from adam5000 import settings
+from dcon import settings
 
 
 def bloc(**remplace):

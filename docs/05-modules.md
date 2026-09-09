@@ -1,6 +1,6 @@
 # 5. `modules.py` — le décodage des valeurs
 
-Fichier : [ADAM/adam5000/modules.py](../ADAM/adam5000/modules.py) — 87 lignes.
+Fichier : [serie/dcon/modules.py](../serie/dcon/modules.py) — 87 lignes.
 
 **Rôle :** transformer une charge utile (déjà validée par `verify_frame()`) en
 liste de valeurs de voies. Une fonction par module d'E/S.
@@ -10,8 +10,8 @@ sont des **fonctions pures**, sans matériel ni état. Tu peux les appeler à la
 main :
 
 ```sh
-cd ADAM
-python3 -c "from adam5000 import modules; print(modules.parse_5050('01FF00'))"
+cd serie
+python3 -c "from dcon import modules; print(modules.parse_5050('01FF00'))"
 ```
 
 ## Les constantes

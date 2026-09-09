@@ -1,6 +1,6 @@
 # 9. `cli.py` — arguments et affichage
 
-Fichier : [ADAM/adam5000/cli.py](../ADAM/adam5000/cli.py) — 386 lignes, le plus
+Fichier : [serie/dcon/cli.py](../serie/dcon/cli.py) — 386 lignes, le plus
 gros du paquet.
 
 **Rôle :** lire la ligne de commande, choisir quoi faire, et **mettre en forme**.
@@ -82,7 +82,7 @@ Puis elle assemble les options (`--port`, `--baud`, `--address`, et selon le cas
 `--no-checksum`, `--5050 --slot N`) pour produire par exemple :
 
 ```
-python3 -m adam5000 --port /dev/ttyUSB0 --baud 9600 --address 01 --no-checksum --5050 --slot 0
+python3 -m dcon --port /dev/ttyUSB0 --baud 9600 --address 01 --no-checksum --5050 --slot 0
 ```
 
 ## Les fonctions d'affichage
@@ -284,10 +284,10 @@ Trois choses à retenir :
    vient juste après, pour la même raison : il ne touche ni au port ni au
    module.
 2. **Le message d'erreur va sur `sys.stderr`**, pas sur la sortie standard. Ainsi
-   `python3 -m adam5000 … > mesures.txt` met les mesures dans le fichier et
+   `python3 -m dcon … > mesures.txt` met les mesures dans le fichier et
    laisse les erreurs à l'écran.
 3. **Le code de retour** : `0` = succès, `1` = échec. C'est la convention Unix,
-   utilisable dans un script shell (`if python3 -m adam5000 …; then`).
+   utilisable dans un script shell (`if python3 -m dcon …; then`).
    `__main__.py` le transmet au système avec `raise SystemExit(main())`.
 
 Sur le `except Exception` large, voir la [relecture](10-relecture.md#5-except-exception-masque-la-trace-en-cas-de-bogue).
@@ -301,18 +301,27 @@ from .cli import main
 raise SystemExit(main())
 ```
 
-Le fichier qu'exécute `python3 -m adam5000`. `raise SystemExit(valeur)` est la
+Le fichier qu'exécute `python3 -m dcon`. `raise SystemExit(valeur)` est la
 façon idiomatique de sortir avec un code de retour ; c'est équivalent à
 `sys.exit()` sans avoir à importer `sys`.
 
 ### `__init__.py`
 
-Il fait deux choses :
+Sa docstring explique le choix du nom du paquet : **DCON** est le protocole
+ASCII commun aux Advantech ADAM (5000 à fond de panier, 4000 autonomes) et
+aux ICPcon I-7000 — la grammaire d'enveloppe (accusé, checksum, terminateur)
+est la même d'un modèle à l'autre, seules la commande de lecture et le
+décodage de la charge utile changent. Le paquet porte donc le nom du
+protocole plutôt que celui d'une gamme de modules. Dans le code, seul
+l'ADAM-5000 est câblé : c'est le seul modèle pour lequel `modules.py` sait
+décoder une charge utile.
+
+Le fichier fait ensuite deux choses :
 
 1. **Marquer le dossier comme un paquet** (même vide, un `__init__.py` suffit).
 2. **Définir l'API publique** : réexporter les noms utiles pour qu'on puisse
-   écrire `from adam5000 import Monitor` sans connaître le fichier d'origine.
-   La liste `__all__` déclare ce qui sort avec `from adam5000 import *`. Elle
+   écrire `from dcon import Monitor` sans connaître le fichier d'origine.
+   La liste `__all__` déclare ce qui sort avec `from dcon import *`. Elle
    inclut `SlotSettings` et `load_settings` (alias de `settings.load`), pour
    qu'un script puisse lire un fichier de réglages sans importer `settings`
    directement.

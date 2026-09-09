@@ -31,6 +31,14 @@ le module ; **si les deux côtés ne sont pas d'accord, la trame est ignorée sa
 message d'erreur** — le symptôme est un silence total. Voir
 [04-protocol.md](04-protocol.md).
 
+**DCON** — Le protocole ASCII décrit dans ce glossaire et dans
+[04-protocol.md](04-protocol.md) : trame terminée par `\r`, accusé `>`/`!`/`?`,
+checksum optionnelle. C'est le protocole commun aux Advantech ADAM (5000 à
+fond de panier, 4000 autonomes) et aux ICPcon I-7000 — la grammaire
+d'enveloppe est la même, seules la commande de lecture et le décodage de la
+charge utile changent d'un modèle à l'autre. Le paquet Python du dépôt porte
+ce nom ; seul l'ADAM-5000 y est câblé.
+
 **DTR / RTS** — Deux lignes de contrôle du port série (*Data Terminal Ready*,
 *Request To Send*), héritées de l'époque des modems. Beaucoup de convertisseurs
 USB-série n'émettent pas si elles ne sont pas levées, d'où

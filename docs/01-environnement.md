@@ -50,11 +50,11 @@ programme est mono-tâche et volontairement simple.
 ### Le lanceur interactif (le plus simple)
 
 ```sh
-sh ADAM/lancer_adam.sh
+sh serie/lancer_adam.sh
 ```
 
 Il pose trois questions (action, port, vitesse), gère les droits `sudo` si
-besoin, puis construit la ligne de commande `python3 -m adam5000 …` à ta place.
+besoin, puis construit la ligne de commande `python3 -m dcon …` à ta place.
 Le script `choisir_port.sh` s'occupe du choix du port et des permissions ; il
 est *sourcé* (`.`) par les deux lanceurs, donc les variables `$PORT` et
 `$USE_SUDO` qu'il définit sont visibles ensuite.
@@ -62,23 +62,23 @@ est *sourcé* (`.`) par les deux lanceurs, donc les variables `$PORT` et
 ### En direct
 
 ```sh
-cd ADAM
-python3 -m adam5000 --port /dev/ttyUSB0 --baud 9600 --5050
+cd serie
+python3 -m dcon --port /dev/ttyUSB0 --baud 9600 --5050
 ```
 
 ### Pourquoi `-m` et pas autre chose
 
-Le dossier `adam5000/` est un **paquet** Python : ses fichiers se référencent
+Le dossier `dcon/` est un **paquet** Python : ses fichiers se référencent
 entre eux avec des imports relatifs (`from . import protocol`). Le point
 signifie « le paquet auquel j'appartiens ».
 
-- `python3 -m adam5000` → Python charge d'abord le paquet `adam5000`, puis
+- `python3 -m dcon` → Python charge d'abord le paquet `dcon`, puis
   exécute son `__main__.py`. Le paquet existe, les imports relatifs marchent.
-- `python3 adam5000/__main__.py` → Python exécute un simple script isolé. Il
+- `python3 dcon/__main__.py` → Python exécute un simple script isolé. Il
   n'y a plus de paquet parent, donc `from .cli import main` échoue avec
   `attempted relative import with no known parent package`.
 
-Et il faut être dans `ADAM/` (le dossier *parent* de `adam5000/`) pour que
+Et il faut être dans `serie/` (le dossier *parent* de `dcon/`) pour que
 Python trouve le paquet dans le répertoire courant. C'est pourquoi les deux
 lanceurs shell font `cd "$SCRIPT_DIR"` avant d'appeler `python3`.
 
@@ -92,12 +92,12 @@ Deux solutions, dans cet ordre de préférence :
 
 ```sh
 sudo usermod -aG dialout $USER   # définitif ; nécessite de se reconnecter
-sudo python3 -m adam5000 …       # ponctuel ; ce que propose choisir_port.sh
+sudo python3 -m dcon …       # ponctuel ; ce que propose choisir_port.sh
 ```
 
 ## Les options de la ligne de commande
 
-Toutes définies dans `parse_args()` de [`cli.py`](../ADAM/adam5000/cli.py) —
+Toutes définies dans `parse_args()` de [`cli.py`](../serie/dcon/cli.py) —
 détaillées dans [09-cli.md](09-cli.md).
 
 | Option | Défaut | Rôle |
@@ -123,13 +123,13 @@ détaillées dans [09-cli.md](09-cli.md).
 
 ## Les tests automatisés
 
-`ADAM/tests/` contient une suite de tests unitaires, écrite avec `unittest` de
+`serie/tests/` contient une suite de tests unitaires, écrite avec `unittest` de
 la bibliothèque standard — aucune dépendance externe, donc rien à installer ici
 non plus. Elle se lance avec la même contrainte de répertoire que le paquet
 lui-même :
 
 ```sh
-cd ADAM
+cd serie
 python3 -m unittest discover tests
 ```
 

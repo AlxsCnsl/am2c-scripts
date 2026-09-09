@@ -1,6 +1,6 @@
 # 10. Relecture critique du code Python
 
-Relecture des fichiers Python du paquet `adam5000`. Les constats sont classés
+Relecture des fichiers Python du paquet `dcon`. Les constats sont classés
 par gravité. Chaque anomalie est reproduite ou tracée jusqu'à la ligne
 concernée ; **aucune correction n'a été appliquée** — ce document propose, il
 ne modifie pas.
@@ -19,7 +19,7 @@ sont réelles mais mineures ; aucune ne remet en cause la conception.
 ## 1. `parse_5050()` confond un mot d'état avec l'adresse
 
 **Gravité : moyenne — bogue reproductible**
-[modules.py:59](../ADAM/adam5000/modules.py#L59)
+[modules.py:59](../serie/dcon/modules.py#L59)
 
 ```python
 if payload.upper().startswith(address.upper()):
@@ -35,10 +35,10 @@ mangés.
 Reproduction (adresse par défaut `01`) :
 
 ```
-$ python3 -c "from adam5000 import modules; print(modules.parse_5050('0100'))"
+$ python3 -c "from dcon import modules; print(modules.parse_5050('0100'))"
 ValueError: Mot d'état illisible : '00'
 
-$ python3 -c "from adam5000 import modules; print(modules.parse_5050('01FF'))"
+$ python3 -c "from dcon import modules; print(modules.parse_5050('01FF'))"
 ValueError: Mot d'état illisible : 'FF'
 ```
 
@@ -68,7 +68,7 @@ l'adresse en tête est sans ambiguïté.
 ## 2. Les octets qui suivent le `\r` sont perdus
 
 **Gravité : faible en usage normal, à connaître**
-[serial_port.py:124](../ADAM/adam5000/serial_port.py#L124)
+[serial_port.py:124](../serie/dcon/serial_port.py#L124)
 
 ```python
 frame, _, rest = bytes(data).partition(b"\r")
@@ -102,7 +102,7 @@ la phrase qui dit que c'est un choix.
 ## 3. Une vitesse inconnue passe sans erreur
 
 **Gravité : faible — l'API interne contredit sa propre garde**
-[serial_port.py:44](../ADAM/adam5000/serial_port.py#L44)
+[serial_port.py:44](../serie/dcon/serial_port.py#L44)
 
 ```python
 self.baud = baud_constant(baud) if baud in BAUDRATES else baud
@@ -137,7 +137,7 @@ où `B9600 == 13`, la ligne continue d'accepter les deux formes.)
 ## 4. `--scan-addresses` ne propose pas de commande à relancer
 
 **Gravité : faible — fonctionnalité inachevée**
-[cli.py:128-137](../ADAM/adam5000/cli.py#L128-L137)
+[cli.py:128-137](../serie/dcon/cli.py#L128-L137)
 
 Dans le chemin nominal, `run_scan()` termine par
 `print(suggest_command(args.port, trouvailles))` : l'utilisateur reçoit la ligne
@@ -178,7 +178,7 @@ else:
 ## 5. `except Exception` masque la trace en cas de bogue
 
 **Gravité : faible — gêne la mise au point**
-[cli.py:382](../ADAM/adam5000/cli.py#L382)
+[cli.py:382](../serie/dcon/cli.py#L382)
 
 ```python
 except Exception as exc:
@@ -214,7 +214,7 @@ conventionnel pour une interruption).
 ## 6. `__init__.py` ne reflète plus le contenu du paquet
 
 **Gravité : faible — cohérence**
-[__init__.py](../ADAM/adam5000/__init__.py)
+[__init__.py](../serie/dcon/__init__.py)
 
 L'API publique déclarée date d'avant le support du 5050 et du diagnostic. Il
 manque : `Monitor5050`, `parse_5050`, `digital_read_command`, `DEFAULT_ADDRESS`,
@@ -244,7 +244,7 @@ extérieur ne l'importe).
 Sans conséquence, mais à savoir :
 
 - **`rejected_since_ok` n'est pas remis à zéro sur un `Failure`.**
-  [monitor.py:108](../ADAM/adam5000/monitor.py#L108) — après un cycle
+  [monitor.py:108](../serie/dcon/monitor.py#L108) — après un cycle
   entièrement raté, le compteur continue de s'accumuler et sera reporté sur la
   prochaine mesure réussie. C'est cohérent avec le libellé affiché (« trames
   rejetées avant celle-ci »), donc probablement voulu ; ça mérite une ligne de
@@ -256,20 +256,20 @@ Sans conséquence, mais à savoir :
   ambiguë. `afficher_activation_checksum()` côté CLI lèverait le doute.
 
 - **`Monitor5050` fixe `channels` en dur.**
-  [monitor.py:129](../ADAM/adam5000/monitor.py#L129) — passer `channels=` à son
+  [monitor.py:129](../serie/dcon/monitor.py#L129) — passer `channels=` à son
   constructeur provoquerait un `TypeError` (argument dupliqué), et `width` reste
   accepté alors qu'il ne sert à rien pour un module tout ou rien. Sans
   conséquence aujourd'hui, `cli.py` ne les passe pas.
 
 - **`EXPECTED_CHANNELS = 8` contre « l'ADAM-5081 compte 4 voies ».**
-  [modules.py:9-16](../ADAM/adam5000/modules.py#L9-L16) — la docstring et la
+  [modules.py:9-16](../serie/dcon/modules.py#L9-L16) — la docstring et la
   constante ne disent pas la même chose. Le commentaire l'assume (« plusieurs
   champs par voie »), mais la valeur reste une hypothèse **non confirmée contre
   le matériel**. À trancher avec `--raw` sur le module réel, puis à figer avec un
   commentaire qui dit ce qui a été observé.
 
 - **`show_raw()` ne vide pas le tampon d'entrée.**
-  [cli.py:236](../ADAM/adam5000/cli.py#L236) — `configuration.send_once()` ouvre
+  [cli.py:236](../serie/dcon/cli.py#L236) — `configuration.send_once()` ouvre
   le port et lit aussitôt. Un reliquat d'une exécution précédente pourrait être
   pris pour la réponse. Un `flush_input()` après ouverture, comme le fait
   `diagnostic.attempt()`, fiabiliserait l'outil de mise au point.

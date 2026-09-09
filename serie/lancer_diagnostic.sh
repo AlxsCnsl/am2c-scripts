@@ -36,7 +36,7 @@ esac
 cd "$SCRIPT_DIR" || exit 1
 
 echo
-$USE_SUDO python3 -m adam5000 \
+$USE_SUDO python3 -m dcon \
   --port "$PORT" \
   --address "$adresse" \
   --scan \

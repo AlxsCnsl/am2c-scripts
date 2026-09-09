@@ -1,6 +1,6 @@
 # 3. `serial_port.py` — la couche transport
 
-Fichier : [ADAM/adam5000/serial_port.py](../ADAM/adam5000/serial_port.py) — 144 lignes.
+Fichier : [serie/dcon/serial_port.py](../serie/dcon/serial_port.py) — 144 lignes.
 
 **Rôle :** ouvrir un port série, le régler, écrire des octets dessus, lire une
 trame jusqu'au retour chariot. Il ne sait rien du protocole ADAM.

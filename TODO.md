@@ -16,7 +16,7 @@ nouvel arbitrage : les seules cases qui attendent une main humaine sont marquée
 | Étape | État | Fait |
 |---|---|---|
 | 1 — Poser le filet de tests | faite | 6/6 |
-| 2 — Renommage `dcon` / `serie/` | à faire | 0/6 |
+| 2 — Renommage `dcon` / `serie/` | faite | 6/6 |
 | 3 — Rendre `protocol.py` générique | à faire | 0/4 |
 | 4 — Familles et registre de modules | à faire | 0/11 |
 | 5 — Un seul `Monitor` | à faire | 0/7 |
@@ -131,22 +131,22 @@ moyen de refactorer sans casser un décodage en silence.
 Fait maintenant, tant que le dépôt est petit, pour que tout le travail des étapes
 suivantes s'écrive directement sous le nom définitif.
 
-- [ ] `git mv ADAM serie` puis `git mv serie/adam5000 serie/dcon`. Les imports
+- [x] `git mv ADAM serie` puis `git mv serie/adam5000 serie/dcon`. Les imports
       internes sont relatifs : rien à corriger dedans, sauf `__init__.py` et
       `__main__.py` s'ils nomment le paquet.
-- [ ] Lanceurs : `serie/lancer_adam.sh`, `serie/lancer_diagnostic.sh`,
+- [x] Lanceurs : `serie/lancer_adam.sh`, `serie/lancer_diagnostic.sh`,
       `serie/choisir_port.sh` et `./lancer-adam.sh` à la racine (qui garde son
       nom et ne change que de chemin).
-- [ ] Textes : `CLAUDE.md`, `serie/README.md`, tout `docs/` — y compris la
+- [x] Textes : `CLAUDE.md`, `serie/README.md`, tout `docs/` — y compris la
       consigne « lancer avec `-m` depuis le dossier du paquet ».
-- [ ] Ajouter en tête de `serie/dcon/__init__.py` une phrase qui dit ce que le
+- [x] Ajouter en tête de `serie/dcon/__init__.py` une phrase qui dit ce que le
       nom recouvre : protocole ASCII DCON, familles Advantech ADAM et ICPcon.
-- [ ] Vérifier qu'il ne reste aucune occurrence du vieux nom de paquet ni du
+- [x] Vérifier qu'il ne reste aucune occurrence du vieux nom de paquet ni du
       vieux chemin : `grep -rn 'adam5000\|ADAM/' . --exclude-dir=.git`. Les
       mentions de « ADAM-5000 » ou « ADAM-5050 » comme références matérielles
       sont légitimes et restent.
 
-- [ ] **Fin d'étape :** `python3 -m dcon --help` répond depuis `serie/`, la suite
+- [x] **Fin d'étape :** `python3 -m dcon --help` répond depuis `serie/`, la suite
       de tests de l'étape 1 passe toujours, et `./lancer-adam.sh` démarre.
 
 ---
