@@ -30,6 +30,7 @@ jamais toucher.
 | [`etapes.conf`](etapes.conf) | Le périmètre d'écriture par étape. Source unique, lue par le script **et** par le hook. |
 | [`etat.env`](etat.env) | Le frein. Quatre valeurs, écrites par l'agent. |
 | [`boucle.sh`](boucle.sh) | Le pilote : développeur → gardes → frein → todo → documenter → commit + tag. |
+| [`deroule.py`](deroule.py) | Rend lisible, au fil de l'eau, ce que fait l'agent. Sans lui la boucle est muette jusqu'à la fin de l'étape. |
 | [`permissions-boucle.json`](permissions-boucle.json) | Ce que les agents ont le droit de lancer **pendant** la boucle. Liste blanche. |
 | [`trouver-claude.sh`](trouver-claude.sh) | Où est l'exécutable `claude` quand il n'est pas dans le `PATH`. |
 | [`../lancer-boucle.sh`](../lancer-boucle.sh) | Le contrôle avant vol, puis le lancement. |
