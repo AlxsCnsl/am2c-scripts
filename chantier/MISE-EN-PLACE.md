@@ -35,6 +35,8 @@ jamais toucher.
 | [`../lancer-boucle.sh`](../lancer-boucle.sh) | Le contrôle avant vol, puis le lancement. |
 | [`CONVENTIONS.md`](CONVENTIONS.md) | Les neuf règles d'autonomie. Trois sont vérifiées mécaniquement. |
 | [`traces/`](traces/) | Une trace par étape, définitive. |
+| [`suivi.sh`](suivi.sh) | Vue en direct des étapes. Recompte les cases, ne recopie pas le tableau. |
+| [`journal.sh`](journal.sh) | Vue en direct du frein et du journal. |
 | [`JOURNAL.md`](JOURNAL.md) | Une ligne par étape. Ne se lit que si ça s'est arrêté. |
 | [`.claude/hooks/perimetre-garde.py`](../.claude/hooks/perimetre-garde.py) | Refuse l'écriture hors périmètre **avant** qu'elle parte. |
 | [`.claude/agents/developpeur.md`](../.claude/agents/developpeur.md) | Exécute une étape. Ne touche ni `TODO.md` ni `docs/`. |
@@ -287,6 +289,14 @@ en dix secondes. Ce qu'il constate : l'exécutable `claude` et sa version, le
 fichier de permissions, l'arbre propre, la suite verte et son cliquet, les
 hooks exécutables, les trois sous-agents, et une ligne d'`etapes.conf` par
 étape demandée.
+
+Pendant qu'elle tourne, deux vues à laisser dans un volet — elles ne changent
+rien, elles regardent : `sh chantier/suivi.sh` (les étapes) et
+`sh chantier/journal.sh` (le frein et le journal).
+
+`suivi.sh` recompte les cases de `TODO.md` et des `TODO/part*.md` au lieu de
+recopier le tableau de bord — le tableau est tenu par l'agent `todo`, les cases
+sont le fait, et l'écart entre les deux est précisément ce qu'on veut voir.
 
 Ne lance pas `sh chantier/gardes.sh 3` en espérant du vert avant de partir : le
 critère propre à l'étape 3 est ce que l'étape 3 *produit*. Il est rouge tant

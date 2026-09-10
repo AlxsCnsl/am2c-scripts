@@ -57,10 +57,10 @@ fi
 # 2. Les permissions de la boucle. Sans ce fichier, les agents tournent en mode
 #    -p sans droit d'exécuter quoi que ce soit — pas même la suite de tests.
 if [ -f chantier/permissions-boucle.json ] \
-   && python3 -c "import json,sys; json.load(open('chantier/permissions-boucle.json'))" 2>/dev/null; then
+   && grep -q '"allow"' chantier/permissions-boucle.json; then
     ok "permissions de la boucle : chantier/permissions-boucle.json"
 else
-    recale "chantier/permissions-boucle.json absent ou illisible"
+    recale "chantier/permissions-boucle.json absent ou sans liste « allow »"
 fi
 
 # 3. L'arbre de travail. boucle.sh refuse de démarrer sale, et il a raison :
