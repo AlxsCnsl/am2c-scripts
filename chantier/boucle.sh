@@ -3,6 +3,10 @@
 #
 #   sh chantier/boucle.sh [première] [dernière]      (défaut : 3 11)
 #
+# Entre deux étapes la boucle souffle PAUSE secondes (défaut 7200, soit 2 h) :
+# le temps de relire un diff et de couper une dérive avant qu'elle se propage.
+# PAUSE=0 enchaîne sans attendre.
+#
 # Une étape se déroule ainsi :
 #   1. le frein est effacé  — un OK périmé ne peut pas être hérité
 #   2. l'agent « developpeur » fait le travail et écrit sa trace
@@ -35,6 +39,36 @@ REGLAGES="$RACINE/chantier/permissions-boucle.json"
 # Garde-temps par agent. Un agent qui ne rend jamais la main figerait la boucle
 # sans rien écrire dans etat.env : le frein reste ABSENT et l'étape s'arrête.
 DELAI=${DELAI:-3600}
+
+# Pause entre deux étapes. Une étape gravée n'enchaîne pas sur la suivante :
+# la boucle souffle, ce qui laisse le temps de relire un diff, de voir venir
+# une dérive et de couper avant qu'elle se propage sur trois étapes.
+#
+# En secondes. PAUSE=0 enchaîne sans attendre (l'ancien comportement).
+#   PAUSE=0 sh chantier/boucle.sh 4 6      d'affilée
+#   PAUSE=1800 sh chantier/boucle.sh       une étape toutes les 30 min
+PAUSE=${PAUSE:-7200}
+
+# « 7200 » → « 2 h ». Uniquement pour l'affichage.
+en_clair() {
+    if   [ "$1" -ge 3600 ]; then printf '%d h %02d' $(($1 / 3600)) $(($1 % 3600 / 60))
+    elif [ "$1" -ge 60 ];   then printf '%d min' $(($1 / 60))
+    else                         printf '%d s' "$1"
+    fi
+}
+
+# Souffler avant l'étape suivante. Rien à la toute fin : personne n'attend
+# devant un chantier terminé.
+souffler() {
+    [ "$PAUSE" -gt 0 ] || return 0
+    [ "$1" -le "$FIN" ] || return 0
+    echo
+    echo "── pause $(en_clair "$PAUSE") avant l'étape $1 ──"
+    echo "   reprise vers $(date -d "+$PAUSE seconds" '+%H:%M' 2>/dev/null \
+        || date -v "+${PAUSE}S" '+%H:%M' 2>/dev/null || echo '?')"
+    echo "   Ctrl-C pour s'arrêter là : l'étape précédente est déjà gravée."
+    sleep "$PAUSE"
+}
 if command -v timeout >/dev/null 2>&1; then
     borner() { timeout "$DELAI" "$@"; }
 else
@@ -140,6 +174,7 @@ COMMIT
     echo "étape $N franchie et gravée (tag etape-$N)"
 
     N=$((N + 1))
+    souffler "$N"
 done
 
 echo

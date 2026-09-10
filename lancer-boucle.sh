@@ -13,6 +13,11 @@
 #   ./lancer-boucle.sh --essai         contrôle + un vrai appel d'agent à blanc
 #   ./lancer-boucle.sh --fond [3 11]   détaché : survit à la fermeture du terminal
 #
+# Entre deux étapes, la boucle souffle PAUSE secondes (défaut 7200, soit 2 h) —
+# le temps de relire un diff et de couper une dérive avant qu'elle se propage.
+#   PAUSE=0 ./lancer-boucle.sh 4 6     d'affilée, sans attendre
+#   PAUSE=1800 ./lancer-boucle.sh      une étape toutes les 30 min
+#
 # By :
 # > alexis consolo (alexis.consolo@outlook.com)
 #
