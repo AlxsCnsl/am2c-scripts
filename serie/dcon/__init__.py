@@ -9,12 +9,11 @@ modèle à l'autre.
 Seul l'ADAM-5000 est câblé ici pour l'instant.
 """
 from .configuration import enable_checksum, send_once
+from .familles import ENABLE_CHECKSUM, build_command
 from .modules import EXPECTED_CHANNELS, EXPECTED_WIDTH, parse_5081
 from .monitor import Failure, Measurement, Monitor
 from .settings import SlotSettings, load as load_settings
 from .protocol import (
-    ENABLE_CHECKSUM,
-    build_command,
     build_frame,
     checksum_ascii,
     verify_frame,

@@ -7,7 +7,7 @@ import time
 from collections import namedtuple
 from datetime import datetime
 
-from . import protocol
+from . import familles, protocol
 from .modules import (
     EXPECTED_CHANNELS,
     EXPECTED_WIDTH,
@@ -67,7 +67,7 @@ class Monitor:
 
     def request(self):
         """Trame envoyée à chaque cycle : propre au module lu."""
-        return protocol.build_command(self.address, self.slot, self.checksum)
+        return familles.build_command(self.address, self.slot, self.checksum)
 
     def decode(self, response):
         """Contrôle de trame puis découpage en voies : propre au module lu."""
@@ -129,7 +129,7 @@ class Monitor5050(Monitor):
         super().__init__(port, slot=slot, channels=IO_CHANNELS, **kwargs)
 
     def request(self):
-        command = protocol.digital_read_command(self.address, self.slot)
+        command = familles.digital_read_command(self.address, self.slot)
         return protocol.build_frame(command, self.checksum)
 
     def decode(self, response):

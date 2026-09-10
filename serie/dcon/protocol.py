@@ -1,12 +1,20 @@
-"""Couche protocole : grammaire ASCII Advantech, indépendante du module d'E/S.
+"""Couche protocole : l'enveloppe ASCII du DCON, et rien d'autre.
 
-Requête       : #<adresse>S<slot>[<checksum>]<CR>
-Réponse       : ><charge utile>[<checksum>]<CR>   (un '?' à la place du '>' = erreur)
-Tout ou rien  : $<adresse>S<slot>6[<checksum>]<CR> (réponse !<charge utile>)
-Configuration : %<champs>[<checksum>]<CR>         (réponse !<adresse> si acceptée)
+Ici on habille et on contrôle une trame ; on ne dit jamais ce qu'elle demande.
+Le jeu de commandes — la forme exacte de la requête, l'emplacement qu'elle
+désigne dans un fond de panier, la trame qui active la checksum — appartient
+à la famille de matériel et vit à côté.
 
-La checksum est optionnelle sur l'ADAM : un module sorti d'usine n'en attend
-pas et n'en renvoie pas. Toutes les fonctions prennent donc un drapeau
+Ce qui est commun à toute la famille ASCII Advantech/DCON :
+
+Requête  : <corps>[<checksum>]<CR>
+Réponse  : <accusé><charge utile>[<checksum>]<CR>
+
+L'accusé positif vaut '>' pour une lecture de valeurs, '!' pour un état ou
+une configuration acceptée ; un '?' à la place signale un refus du module.
+
+La checksum est optionnelle sur ces modules : sorti d'usine, un module n'en
+attend pas et n'en renvoie pas. Toutes les fonctions prennent donc un drapeau
 `checksum`, qui doit refléter l'état réel du module ; sinon la trame envoyée
 est ignorée et la réponse mal découpée.
 """
@@ -18,16 +26,6 @@ CONFIG_ACK = "!"
 # Adresse de station par défaut : celle que porte un module sorti d'usine.
 DEFAULT_ADDRESS = "01"
 
-# Trame d'activation de la checksum, telle que fournie par la documentation du
-# module (notation Advantech %AANNCCFF) :
-#   %   01        00          08              40
-#       adresse   champ       38400 bauds     format de données,
-#                 suivant                     bit 6 à 1 = checksum
-# Elle est reprise à l'identique : ne recomposer ces champs qu'avec la
-# documentation du module sous les yeux (--config-command permet de la
-# remplacer sans toucher au code).
-ENABLE_CHECKSUM = "%01000840"
-
 def checksum_ascii(text):
     return f"{sum(text.encode('ascii')) & 0xFF:02X}"
 
@@ -35,22 +33,6 @@ def build_frame(command, checksum=True):
     """Habille une commande : checksum optionnelle puis terminateur."""
     body = command.strip().upper()
     return body + (checksum_ascii(body) if checksum else "") + TERMINATOR
-
-def read_command(address=DEFAULT_ADDRESS, slot=0):
-    """Commande de lecture, sans habillage : utile pour l'envoyer telle quelle."""
-    return f"#{address}S{slot}"
-
-def build_command(address=DEFAULT_ADDRESS, slot=0, checksum=True):
-    return build_frame(read_command(address, slot), checksum)
-
-def digital_read_command(address=DEFAULT_ADDRESS, slot=0):
-    """Lecture des voies tout ou rien d'un module de fond de panier (ADAM-5050).
-
-    Grammaire distincte de la lecture analogique : '$' au lieu de '#', et un 6
-    final imposé par la documentation. La réponse est accusée par '!' et non
-    par '>', d'où le paramètre `ack` de verify_frame().
-    """
-    return f"${address}S{slot}6"
 
 def verify_frame(response, checksum=True, ack=ACK):
     """Valide la checksum et l'accusé positif, rend la charge utile."""

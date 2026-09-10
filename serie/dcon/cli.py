@@ -2,7 +2,7 @@
 import argparse
 import sys
 
-from . import configuration, diagnostic, protocol, settings
+from . import configuration, diagnostic, familles, protocol, settings
 from .modules import (
     EXPECTED_CHANNELS,
     EXPECTED_WIDTH,
@@ -200,7 +200,7 @@ def parse_args(argv=None):
                         help="le module n'utilise pas la checksum")
     parser.add_argument("--enable-checksum", action="store_true",
                         help="activer la checksum du module, puis quitter")
-    parser.add_argument("--config-command", default=protocol.ENABLE_CHECKSUM,
+    parser.add_argument("--config-command", default=familles.ENABLE_CHECKSUM,
                         help="trame d'activation envoyée (défaut : %(default)s)")
     parser.add_argument("--channels", type=int, default=EXPECTED_CHANNELS,
                         help="nombre de voies attendues (défaut : %(default)s)")
@@ -227,10 +227,10 @@ def show_raw(args):
     checksum = not args.no_checksum
 
     if args.io_5050:
-        command = protocol.digital_read_command(args.address, args.slot)
+        command = familles.digital_read_command(args.address, args.slot)
         ack = protocol.CONFIG_ACK
     else:
-        command = protocol.read_command(args.address, args.slot)
+        command = familles.read_command(args.address, args.slot)
         ack = protocol.ACK
 
     response = configuration.send_once(

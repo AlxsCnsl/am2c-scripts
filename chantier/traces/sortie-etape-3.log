@@ -1,0 +1,14 @@
+Le sous-agent `developpeur` a exécuté le travail de l'étape 3, mais s'est arrêté en `ETAT=PLAN_FAUX` — un vrai désaccord entre le plan et l'outillage, pas une panne.
+
+**Ce qui a été fait** : `protocol.py` réduit à la seule enveloppe ASCII (`TERMINATOR`, `ACK`, `CONFIG_ACK`, `DEFAULT_ADDRESS`, `checksum_ascii`, `build_frame`, `verify_frame`). `read_command`, `build_command`, `digital_read_command` et `ENABLE_CHECKSUM` déplacés vers un nouveau `serie/dcon/familles.py`. Six importateurs recâblés. 72 tests, tous verts.
+
+**Pourquoi ça bloque** : la garde `gardes.sh` (invariant I2) n'accepte une trame `%` (comme `ENABLE_CHECKSUM`) que dans `configuration.py`, `protocol.py`, ou le **répertoire** `familles/`. Mais le périmètre autorisé pour l'étape 3 (`chantier/etapes.conf`) n'autorise que des fichiers `.py` à plat dans le paquet — pas la création de `familles/`, réservée à l'étape 4. L'ancien `TODO/part3.md` fusionnait ces deux étapes ; la version actuelle de `TODO.md` les a séparées sans ajuster la garde ni le périmètre en conséquence.
+
+L'agent a contourné provisoirement en créant un fichier plat `serie/dcon/familles.py` (pas un répertoire) pour que les tests passent, mais s'est arrêté car ce n'est écrit nulle part dans le plan — c'est une décision d'arbitrage, pas la sienne à prendre.
+
+**Trois issues possibles** (à toi de trancher) :
+1. Élargir la garde I2 pour tolérer aussi le fichier `familles.py` (pas seulement le répertoire).
+2. Autoriser explicitement `@PAQ@/familles/*` dans le périmètre de l'étape 3 — l'étape 3 se termine alors par un simple `git mv familles.py familles/__init__.py` ou équivalent.
+3. Garder `ENABLE_CHECKSUM` dans `protocol.py` jusqu'à l'étape 4 — mais ça viole les points 1 et 2 du TODO pour l'étape 3.
+
+Rien n'a été commité ; l'arbre de travail contient les changements en l'état (visible via `git status`). Comment veux-tu trancher ?

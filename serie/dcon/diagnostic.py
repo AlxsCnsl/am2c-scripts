@@ -18,7 +18,7 @@ met en forme.
 import time
 from collections import namedtuple
 
-from . import protocol
+from . import familles, protocol
 from .modules import IO_SLOTS
 from .serial_port import BAUDRATES, SerialPort
 
@@ -48,11 +48,11 @@ def probes(address, slots=IO_SLOTS):
         (f"${address}M", "nom du module", None),
         (f"${address}F", "version du micrologiciel", None),
         (f"${address}2", "configuration du module", None),
-        (protocol.read_command(address, 0), "lecture analogique, slot 0", None),
+        (familles.read_command(address, 0), "lecture analogique, slot 0", None),
     ]
 
     for slot in range(slots):
-        commands.append((protocol.digital_read_command(address, slot),
+        commands.append((familles.digital_read_command(address, slot),
                          f"16 E/S, slot {slot}", slot))
 
     return commands

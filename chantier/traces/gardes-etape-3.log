@@ -1,0 +1,15 @@
+ok      périmètre respecté
+ok      plan intact (cases et tableau seulement)
+ok      cliquet des tests : 72 (jamais moins de 72)
+REFUS   trame « % » hors de configuration.py / protocol.py / familles/ :
+        serie/dcon/familles.py
+ok      I4  aucun affichage sous la couche cli
+ok      I6  aucune dépendance externe
+ok      I5  HUPCL et tcdrain en place
+ok      I3  aucune purge dans la boucle de mesure
+ok      I7  --scan en tête du dispatch
+ok      I8  le port reste hors du fichier de réglages
+ok      suite de tests verte
+ok      protocol.py ne parle que d'enveloppe
+
+GARDES EN ÉCHEC (1) — étape 3 bloquée.

@@ -1,8 +1,9 @@
 """Grammaire d'enveloppe : checksum, habillage, validation de la réponse.
 
-Ces tests figent le comportement **actuel** de protocol.py. L'étape 3 du
-chantier vide ce fichier de tout ce qui touche au slot ; les cas qui portent
-sur read_command et digital_read_command déménageront alors avec eux.
+Ces tests ne portent plus que sur l'enveloppe : habillage, checksum, contrôle
+de l'accusé. L'étape 3 du chantier a sorti d'ici les cas qui touchaient au
+slot — read_command, digital_read_command, ENABLE_CHECKSUM — ils sont dans
+test_familles.py avec les fonctions qu'ils couvrent.
 """
 import unittest
 
@@ -50,29 +51,6 @@ class BuildFrame(unittest.TestCase):
     def test_terminateur_toujours_present(self):
         for checksum in (True, False):
             self.assertTrue(protocol.build_frame("#01S0", checksum).endswith("\r"))
-
-
-class Commandes(unittest.TestCase):
-
-    def test_lecture_analogique(self):
-        self.assertEqual(protocol.read_command("01", 0), "#01S0")
-        self.assertEqual(protocol.read_command("0A", 3), "#0AS3")
-
-    def test_lecture_tout_ou_rien(self):
-        # Le 6 final est imposé par la documentation du module.
-        self.assertEqual(protocol.digital_read_command("01", 2), "$01S26")
-
-    def test_commande_analogique_habillee(self):
-        self.assertEqual(protocol.build_command("01", 0), "#01S007\r")
-        self.assertEqual(protocol.build_command("01", 0, checksum=False), "#01S0\r")
-
-    def test_adresse_par_defaut(self):
-        self.assertEqual(protocol.DEFAULT_ADDRESS, "01")
-        self.assertTrue(protocol.read_command().startswith("#01S"))
-
-    def test_trame_d_activation_de_checksum(self):
-        # Reprise telle quelle de la documentation : elle ne se recompose pas.
-        self.assertEqual(protocol.ENABLE_CHECKSUM, "%01000840")
 
 
 class VerifyFrame(unittest.TestCase):
