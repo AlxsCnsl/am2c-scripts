@@ -2,6 +2,13 @@
 
 ← [TODO.md](../TODO.md)
 
+> **PÉRIMÉ — ne pas suivre.** Ancienne numérotation, où le dégraissage de
+> `protocol.py` et la création des familles ne faisaient qu'une seule étape.
+> `TODO.md` les a depuis séparées en étapes 3 et 4 ; ce texte-ci ne décrit plus
+> le découpage en vigueur et c'est sa lecture qui a fait échouer l'étape 3
+> (voir `chantier/traces/etape-3.md`). Le détail à jour est dans
+> [part4.md](part4.md). Conservé comme trace, pas comme consigne.
+
 Aujourd'hui `protocol.py` prétend être « indépendant du module d'E/S » mais
 contient `#<addr>S<slot>` et `$<addr>S<slot>6`, qui sont la grammaire du fond de
 panier ADAM-5000. Un ADAM-4000 ou un I-7000 lit par `#<addr>`, sans slot.

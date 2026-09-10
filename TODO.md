@@ -175,7 +175,7 @@ panier ADAM-5000. Un ADAM-4000 ou un I-7000 lit par `#<addr>`, sans slot.
 Le cœur du chantier. Deux registres : la famille porte la grammaire de lecture et
 la notion de slot, le modèle porte son décodage.
 
-→ Détail : [TODO/part3.md](TODO/part3.md)
+→ Détail : [TODO/part4.md](TODO/part4.md)
 
 - [ ] **Fin d'étape :** ajouter un modèle = écrire un fichier dans `modules/` et
       l'inscrire au registre. Rien d'autre. Les tests de l'étape 1 tournent
@@ -249,7 +249,7 @@ serie/dcon/cli/
 Deux manques : le format ne sait décrire qu'un rack à slots, et `--config`
 affiche puis quitte ([cli.py:284](ADAM/adam5000/cli.py#L284)).
 
-→ Détail : [TODO/part6.md](TODO/part6.md)
+→ Détail : [TODO/part7.md](TODO/part7.md)
 
 - [ ] **Fin d'étape :** un rack hétérogène se lit avec une seule commande, sans
       réénumérer les arguments.
