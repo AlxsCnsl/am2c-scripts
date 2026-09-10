@@ -30,6 +30,9 @@ jamais toucher.
 | [`etapes.conf`](etapes.conf) | Le périmètre d'écriture par étape. Source unique, lue par le script **et** par le hook. |
 | [`etat.env`](etat.env) | Le frein. Quatre valeurs, écrites par l'agent. |
 | [`boucle.sh`](boucle.sh) | Le pilote : développeur → gardes → frein → todo → documenter → commit + tag. |
+| [`permissions-boucle.json`](permissions-boucle.json) | Ce que les agents ont le droit de lancer **pendant** la boucle. Liste blanche. |
+| [`trouver-claude.sh`](trouver-claude.sh) | Où est l'exécutable `claude` quand il n'est pas dans le `PATH`. |
+| [`../lancer-boucle.sh`](../lancer-boucle.sh) | Le contrôle avant vol, puis le lancement. |
 | [`CONVENTIONS.md`](CONVENTIONS.md) | Les neuf règles d'autonomie. Trois sont vérifiées mécaniquement. |
 | [`traces/`](traces/) | Une trace par étape, définitive. |
 | [`JOURNAL.md`](JOURNAL.md) | Une ligne par étape. Ne se lit que si ça s'est arrêté. |
@@ -90,6 +93,40 @@ neutraliser par expression régulière sur `-c` — ça tient pour un agent de d
 motifs), et l'agent de développement a de toute façon besoin d'exécuter du
 Python. Le périmètre porte donc sur ce qui est vérifiable — les chemins écrits
 — et pas sur ce qui ne l'est pas.
+
+## Le mode `-p` n'a personne pour répondre « oui »
+
+Le point qui empêchait la boucle de tourner, et qui ne se voit pas en la
+lisant. `boucle.sh` appelle les agents en `claude -p` : aucun humain n'est
+devant. Une demande de permission n'attend donc pas — elle est **refusée
+d'office**. `--permission-mode acceptEdits` couvre les écritures de fichier,
+rien d'autre : le premier `cd serie && python3 -m unittest discover -s tests`
+du `developpeur` partait au refus, et l'agent traversait son étape sans jamais
+pouvoir vérifier son propre travail.
+
+D'où [`permissions-boucle.json`](permissions-boucle.json), passé par
+`--settings`. Deux propriétés à ne pas perdre de vue :
+
+- **C'est une liste blanche.** Ce qui n'y figure pas est refusé, et un refus
+  arrête l'agent au lieu de le laisser improviser. C'est la panne sûre, la même
+  que partout ailleurs ici. Élargir cette liste est donc le seul geste du lot
+  qui demande de la prudence.
+- **`deny` ne protège qu'une chose : l'historique git.** `commit`, `add`,
+  `reset`, `checkout`, `tag`, `push`… appartiennent à `boucle.sh`, qui commite
+  et pose `etape-<N>` à chaque étape franchie. Un agent qui commite lui-même
+  fait sauter le seul moyen de revenir en arrière.
+
+`--settings` a été préféré à un `.claude/settings.json` de projet précisément
+parce qu'il ne bride que la boucle : tes sessions interactives ne voient pas ce
+fichier. Et il est hors du périmètre d'écriture des étapes 3 à 11 — un agent ne
+peut donc pas s'élargir ses propres droits.
+
+Deux autres manques, plus prosaïques, réglés au passage : `claude` n'est pas
+dans le `PATH` d'un terminal quand Claude Code tourne comme extension VS Code
+(d'où [`trouver-claude.sh`](trouver-claude.sh), qui va chercher le binaire dans
+le dossier de l'extension), et un agent qui ne rendrait jamais la main figerait
+la boucle sans rien écrire dans `etat.env` (d'où le `timeout` d'une heure par
+appel, réglable par la variable `DELAI`).
 
 ## Pourquoi les invariants ne sont pas devenus un fichier de tests
 
@@ -207,19 +244,16 @@ observé.
 
 ## 5. Vérifier la forme de l'appel aux agents
 
-`boucle.sh` lance `claude -p "Utilise le sous-agent \`developpeur\` pour …"
---permission-mode acceptEdits`. Je n'ai pas exécuté cette ligne. Teste-la seule,
-une fois, avant de lancer onze étapes dessus :
+C'est maintenant une commande :
 
 ```sh
-echo 3 > chantier/etape-courante
-claude -p "Utilise le sous-agent \`developpeur\` pour lire TODO.md et chantier/CONVENTIONS.md, puis écris uniquement chantier/traces/etape-0.md décrivant ce que tu ferais à l'étape 3. Ne modifie aucun autre fichier." --permission-mode acceptEdits
-rm chantier/etape-courante
+./lancer-boucle.sh --essai
 ```
 
-Tu vérifies d'un coup que le sous-agent est trouvé, que le hook mord, et que la
-trace atterrit au bon endroit. Ajuste les flags dans `boucle.sh` si ta version
-du CLI en veut d'autres.
+Elle fait le contrôle avant vol, puis un vrai appel d'agent qui n'écrit que
+`chantier/traces/etape-0.md`. Tu vérifies d'un coup que le binaire répond, que
+le fichier de permissions est accepté, que le sous-agent est trouvé, que le
+hook mord et que la trace atterrit au bon endroit. Supprime la trace après.
 
 Au passage : `developpeur` tourne en `model: opus`, `todo` et `documenter` en
 `sonnet`. C'est un choix de coût, il est dans le frontmatter, change-le si tu
@@ -241,9 +275,23 @@ courante. C'est un arrêt de plus, et c'est délibéré.
 ## 7. Le lancement
 
 ```sh
-sh chantier/gardes.sh 3          # doit être vert avant de lancer
-sh chantier/boucle.sh 3 11
+./lancer-boucle.sh --verifier    # contrôle avant vol seul, ne lance rien
+./lancer-boucle.sh 3 11          # contrôle, puis lance
+./lancer-boucle.sh --fond 3 11   # détaché : survit à la fermeture du terminal
 ```
+
+`sh chantier/boucle.sh 3 11` marche toujours et fait exactement le travail :
+`lancer-boucle.sh` ne fait que constater avant, parce qu'une boucle qui tourne
+des heures ne doit pas s'arrêter à l'étape 7 pour une raison qu'on pouvait voir
+en dix secondes. Ce qu'il constate : l'exécutable `claude` et sa version, le
+fichier de permissions, l'arbre propre, la suite verte et son cliquet, les
+hooks exécutables, les trois sous-agents, et une ligne d'`etapes.conf` par
+étape demandée.
+
+Ne lance pas `sh chantier/gardes.sh 3` en espérant du vert avant de partir : le
+critère propre à l'étape 3 est ce que l'étape 3 *produit*. Il est rouge tant
+qu'elle n'est pas faite, et c'est normal. `boucle.sh` ne consulte les gardes
+qu'après le passage de l'agent.
 
 À la fin d'un arrêt, tu as toujours de quoi revenir :
 
