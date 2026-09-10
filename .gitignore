@@ -27,3 +27,8 @@ Thumbs.db
 # Sauf le report de console d'une boucle détachée : c'est un doublon de
 # stdout, et la boucle le commiterait pendant qu'il s'écrit encore.
 chantier/traces/boucle-*.log
+
+# Le flux « stream-json » brut des agents : volumineux, et déjà résumé en clair
+# dans le sortie-etape-<N>.log qui, lui, est une pièce. On le garde sur le
+# disque pour pouvoir y revenir, pas dans l'historique.
+chantier/traces/*.jsonl

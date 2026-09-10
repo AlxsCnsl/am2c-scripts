@@ -41,6 +41,27 @@ else
     borner() { "$@"; }
 fi
 
+# Lance un agent et donne à voir ce qu'il fait, pendant qu'il le fait.
+#
+# En -p, le format de sortie par défaut n'émet que le message final : la boucle
+# restait muette pendant toute une étape. « stream-json » émet un objet par
+# ligne au fil de l'eau, que chantier/deroule.py traduit en lignes lisibles.
+#
+# Le JSON brut est conservé à côté (etape-<N>.jsonl) : c'est la seule trace
+# complète si l'affichage se trompe. Le filtre, lui, ne peut rien avaler — une
+# ligne qu'il ne comprend pas est recopiée telle quelle.
+#
+#   agent <numéro d'étape> <consigne>
+agent() {
+    _n=$1
+    borner "$CLAUDE" -p "$2" \
+        --settings "$REGLAGES" --permission-mode acceptEdits \
+        --output-format stream-json --verbose 2>&1 \
+        | tee -a "chantier/traces/etape-$_n.jsonl" \
+        | python3 "$RACINE/chantier/deroule.py" \
+        | tee -a "chantier/traces/sortie-etape-$_n.log"
+}
+
 arret() {
     echo
     echo "═══ ARRÊT à l'étape $1 ═══"
@@ -83,8 +104,7 @@ while [ "$N" -le "$FIN" ]; do
     printf 'ETAT=ABSENT\nRAISON=l agent n a rien ecrit\n' > chantier/etat.env
 
     # 2. Le développeur
-    borner "$CLAUDE" -p "Utilise le sous-agent \`developpeur\` pour exécuter l'étape $N du chantier décrit dans TODO.md. Lis d'abord chantier/CONVENTIONS.md." \
-        --settings "$REGLAGES" --permission-mode acceptEdits >> chantier/traces/sortie-etape-$N.log 2>&1
+    agent "$N" "Utilise le sous-agent \`developpeur\` pour exécuter l'étape $N du chantier décrit dans TODO.md. Lis d'abord chantier/CONVENTIONS.md."
 
     # 3. Les gardes
     if ! sh chantier/gardes.sh "$N" > chantier/traces/gardes-etape-$N.log 2>&1; then
@@ -98,10 +118,8 @@ while [ "$N" -le "$FIN" ]; do
     [ "$ETAT" = "OK" ] || arret "$N" "$ETAT — $RAISON"
 
     # 5. Le plan, puis la documentation
-    borner "$CLAUDE" -p "Utilise le sous-agent \`todo\` pour constater l'état de l'étape $N et mettre TODO.md d'aplomb." \
-        --settings "$REGLAGES" --permission-mode acceptEdits >> chantier/traces/sortie-etape-$N.log 2>&1
-    borner "$CLAUDE" -p "Utilise le sous-agent \`documenter\` après le travail de l'étape $N du chantier." \
-        --settings "$REGLAGES" --permission-mode acceptEdits >> chantier/traces/sortie-etape-$N.log 2>&1
+    agent "$N" "Utilise le sous-agent \`todo\` pour constater l'état de l'étape $N et mettre TODO.md d'aplomb."
+    agent "$N" "Utilise le sous-agent \`documenter\` après le travail de l'étape $N du chantier."
 
     # 6. Reconstat, puis on grave
     if ! sh chantier/gardes.sh "$N" > chantier/traces/gardes-etape-$N-apres.log 2>&1; then
