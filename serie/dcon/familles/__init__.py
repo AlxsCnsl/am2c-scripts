@@ -9,15 +9,16 @@ ces fonctions.
 Requête analogique   : #<adresse>S<slot>      (réponse accusée par '>')
 Requête tout ou rien : $<adresse>S<slot>6     (réponse accusée par '!')
 
-Fichier de transition : l'étape 4 du chantier le remplace par le paquet
-`familles/` (`base.py`, `adam5000.py`, `autonome.py` et son registre). Les
+Paquet en cours de constitution : l'étape 4 du chantier y ajoute le
+descripteur de famille et son registre (`base.py`, `adam5000.py`,
+`autonome.py`) ; ce fichier deviendra le point d'entrée qui les expose. Les
 trames produites ici ne doivent pas changer en chemin — les tests les figent
 caractère par caractère.
 
 Aucune commande de sortie n'est construite ici, ni ailleurs : seule l'image
 des états d'un module tout ou rien est lue.
 """
-from . import protocol
+from .. import protocol
 
 # Trame d'activation de la checksum, telle que fournie par la documentation du
 # module (notation Advantech %AANNCCFF) :

@@ -2,8 +2,8 @@
 
 Ces cas viennent de test_protocol.py, d'où l'étape 3 du chantier les a sortis
 avec les fonctions qu'ils couvrent. Ils figent les trames caractère par
-caractère : l'étape 4, qui découpe `familles.py` en paquet `familles/`, ne doit
-rien changer à ce qu'elles valent.
+caractère : l'étape 4, qui étoffe le paquet `familles/` de son descripteur et
+de son registre, ne doit rien changer à ce qu'elles valent.
 """
 import unittest
 
