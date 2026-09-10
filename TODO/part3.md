@@ -1,37 +1,32 @@
-# Étape 4 — Familles de protocole et registre de modules
+# Étape 3 — `protocol.py` générique et les familles de protocole
 
 ← [TODO.md](../TODO.md)
 
-Le cœur du chantier. Deux registres, deux métiers nets :
+Aujourd'hui `protocol.py` prétend être « indépendant du module d'E/S » mais
+contient `#<addr>S<slot>` et `$<addr>S<slot>6`, qui sont la grammaire du fond de
+panier ADAM-5000. Un ADAM-4000 ou un I-7000 lit par `#<addr>`, sans slot.
 
-- une **famille** dit *comment on demande* — grammaire de lecture, notion de
-  slot, commandes générales de sonde ;
-- un **modèle** dit *comment on lit la réponse* — nombre de voies, largeur,
-  décodage, conversion éventuelle.
-
-Un ADAM-5081 et un ADAM-5050 partagent la famille `adam5000` (fond de panier à
-slots) et diffèrent par leur décodage. Un ICPcon 7070 changera de famille sans
-rien changer au reste.
+On ne peut pas vider `protocol.py` sans donner une destination à ce qui en sort :
+cette étape crée donc les familles **et** déménage. Le registre de modèles, lui,
+attend l'étape 4.
 
 ## La structure visée
 
 ```
 serie/dcon/
-    protocol.py           enveloppe ASCII seule (étape 3)
+    protocol.py           enveloppe ASCII seule
     familles/
-        __init__.py       REGISTRE_FAMILLES
+        __init__.py       REGISTRE_FAMILLES, trouver()
         base.py           Famille, et rien d'autre
         adam5000.py       rack 4 slots : #aaSn (>) / $aaSn6 (!)
         autonome.py       DCON direct : #aa (>) / $aa6 (!)
-    modules/
-        __init__.py       REGISTRE, references(), trouver()
-        base.py           ModuleType, et rien d'autre
-        adam5081.py       analogique
-        adam5050.py       tout ou rien 16 voies
-        layouts.py        possible_layouts(), outil de diagnostic commun
 ```
 
 ## Le descripteur de famille
+
+Une **famille** dit *comment on demande* — grammaire de lecture, notion de slot,
+commandes générales de sonde. Un **modèle** (étape 4) dit *comment on lit la
+réponse*.
 
 | Champ | Rôle |
 |---|---|
@@ -42,52 +37,29 @@ serie/dcon/
 | `commande_checksum(adresse)` | la trame `%` d'activation, propre à la famille |
 | `sondes(adresse)` | commandes générales pour le diagnostic (`$aaM`, `$aaF`, `$aa2`) |
 
-`commande_lecture` consulte `module.nature` pour choisir entre la forme
-analogique (`#`, accusé `>`) et la forme tout ou rien (`$…6`, accusé `!`) : c'est
-la famille qui connaît les deux formes, le modèle qui dit laquelle le concerne.
-
-## Le descripteur de modèle
-
-| Champ | Rôle |
-|---|---|
-| `reference` | « 5050 », « 5081 » — la clé du registre |
-| `libelle` | « ADAM-5050 » pour l'affichage |
-| `famille` | le descripteur de famille, pas son nom |
-| `nature` | `ANALOGIQUE` ou `TOUT_OU_RIEN` — choisit l'affichage et la requête |
-| `voies` | nombre de voies nominal (16 pour le 5050, 4 pour le 5081) |
-| `largeur` | largeur d'un champ, pour l'analogique (10) |
-| `accuse` | `>` ou `!` — attendu par `verify_frame` |
-| `conversion` | `None`, ou une fonction valeur brute → grandeur physique |
-| `decode(charge, adresse)` | rend la liste des valeurs de voies |
+`commande_lecture` consultera `module.nature` pour choisir entre la forme
+analogique (`#`, accusé `>`) et la forme tout ou rien (`$…6`, accusé `!`). Tant
+que l'étape 4 n'a pas créé `ModuleType`, elle prend le strict nécessaire —
+la nature en paramètre — et l'étape 4 lui passera le descripteur.
 
 ## Le travail
 
-- [ ] Créer `familles/` avec `base.py`, `adam5000.py`, `autonome.py` et son
-      registre, en y déplaçant `read_command`, `digital_read_command` et
-      `ENABLE_CHECKSUM` sortis de `protocol.py` à l'étape 3.
+- [ ] Garder dans `protocol.py` uniquement ce qui est vrai pour toute la famille
+      ASCII Advantech/DCON : `TERMINATOR`, `ACK`, `CONFIG_ACK`, `checksum_ascii`,
+      `build_frame`, `verify_frame`, `DEFAULT_ADDRESS`. Mettre à jour son
+      en-tête : il documente une grammaire d'enveloppe, pas un jeu de commandes.
+- [ ] Créer `familles/` avec les quatre fichiers ci-dessus, en y déplaçant
+      `read_command`, `digital_read_command` et `ENABLE_CHECKSUM` **sans changer
+      les trames qu'ils produisent** : les tests de l'étape 1 les figent
+      caractère par caractère et doivent rester verts par simple recâblage
+      d'import.
 - [ ] `autonome.py` est écrite maintenant mais n'est référencée par aucun
       modèle : c'est la place que prendra un 7070. Elle doit être couverte par un
       test de construction de commande, sinon elle pourrira sans qu'on le voie.
-- [ ] Créer le paquet `modules/` avec les cinq fichiers ci-dessus, en déplaçant
-      le décodage existant sans le modifier — sauf la règle de déduction
-      ci-dessous.
-- [ ] Écrire `modules/base.py` : le descripteur `ModuleType` et rien d'autre, y
-      compris le champ `conversion=None` (décision 9), appliqué par `decode()`
-      s'il est défini.
-- [ ] `modules/__init__.py` expose `REGISTRE`, `references()` et
-      `trouver(reference)` qui accepte `5050`, `"5050"` et `"ADAM-5050"` (la
-      normalisation qui vit aujourd'hui dans `settings.read_module`).
-- [ ] `SUPPORTED_MODULES` disparaît : la liste **est** le registre.
-- [ ] `IO_CHANNELS`, `EXPECTED_CHANNELS`, `EXPECTED_WIDTH` deviennent des champs
-      du descripteur concerné, plus des constantes globales.
-- [ ] **Découpage déduit (décision 8)** : le décodage du 5081 déclare
-      `voies=4, largeur=10` comme nominal, puis applique la règle — si
-      `len(charge) % largeur == 0`, alors `voies = len(charge) // largeur` ;
-      sinon on lève une erreur qui cite la longueur observée. La largeur de champ
-      est la donnée fiable, le nombre de voies est ce qui varie.
-- [ ] `IO_SLOTS = 4` n'est plus une constante de `modules` : c'est le champ
+- [ ] Recâbler les six importateurs — `monitor.py`, `cli.py`, `diagnostic.py`,
+      `configuration.py`, `__init__.py` et `tests/test_protocol.py` — vers la
+      famille `adam5000`. Aucun d'eux ne change de comportement.
+- [ ] `IO_SLOTS = 4` cesse d'être une constante de `modules.py` : c'est le champ
       `slots` de la famille `adam5000`, consulté par `settings` et `diagnostic`.
-- [ ] `parse_5050` doit utiliser son paramètre de nombre de voies au lieu de
-      `IO_CHANNELS` en dur.
 
 La case **Fin d'étape** est dans [TODO.md](../TODO.md), avec les autres.

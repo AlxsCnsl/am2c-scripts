@@ -24,3 +24,6 @@ Thumbs.db
 
 # Les traces du chantier sont des pièces, pas des sorties jetables.
 !chantier/traces/*.log
+# Sauf le report de console d'une boucle détachée : c'est un doublon de
+# stdout, et la boucle le commiterait pendant qu'il s'écrit encore.
+chantier/traces/boucle-*.log

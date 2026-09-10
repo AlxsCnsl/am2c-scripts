@@ -20,7 +20,26 @@ cd "$RACINE" || exit 1
 
 DEBUT=${1:-3}
 FIN=${2:-11}
-CLAUDE=${CLAUDE:-claude}
+
+# Où est « claude ». Sur un poste où Claude Code tourne comme extension VS Code,
+# le binaire n'est pas dans le PATH : on va le chercher là où il vit.
+. "$RACINE/chantier/trouver-claude.sh"
+CLAUDE=$(trouver_claude) || CLAUDE=claude
+
+# Permissions des agents pendant la boucle. Indispensable : en mode -p personne
+# ne répond aux demandes de permission, donc tout appel Bash non listé dans ce
+# fichier est refusé d'office — y compris la suite de tests. Passé par
+# --settings, il ne bride que la boucle, jamais tes sessions interactives.
+REGLAGES="$RACINE/chantier/permissions-boucle.json"
+
+# Garde-temps par agent. Un agent qui ne rend jamais la main figerait la boucle
+# sans rien écrire dans etat.env : le frein reste ABSENT et l'étape s'arrête.
+DELAI=${DELAI:-3600}
+if command -v timeout >/dev/null 2>&1; then
+    borner() { timeout "$DELAI" "$@"; }
+else
+    borner() { "$@"; }
+fi
 
 arret() {
     echo
@@ -39,7 +58,13 @@ arret() {
     git status --short
     exit 1
 }
-command -v "$CLAUDE" >/dev/null 2>&1 || { echo "« $CLAUDE » introuvable dans le PATH."; exit 1; }
+command -v "$CLAUDE" >/dev/null 2>&1 || [ -x "$CLAUDE" ] || {
+    echo "Exécutable « claude » introuvable — ni dans le PATH, ni dans les"
+    echo "emplacements connus (voir chantier/trouver-claude.sh)."
+    echo "Force-le au besoin :  CLAUDE=/chemin/vers/claude sh chantier/boucle.sh"
+    exit 1
+}
+[ -f "$REGLAGES" ] || { echo "Fichier de permissions absent : $REGLAGES"; exit 1; }
 [ -d ADAM/tests ] || [ -d serie/tests ] || {
     echo "Aucune suite de tests. L'étape 1 se fait et se relit à la main avant"
     echo "de lancer la boucle : tout le dispositif repose sur la qualité de ce filet."
@@ -58,8 +83,8 @@ while [ "$N" -le "$FIN" ]; do
     printf 'ETAT=ABSENT\nRAISON=l agent n a rien ecrit\n' > chantier/etat.env
 
     # 2. Le développeur
-    "$CLAUDE" -p "Utilise le sous-agent \`developpeur\` pour exécuter l'étape $N du chantier décrit dans TODO.md. Lis d'abord chantier/CONVENTIONS.md." \
-        --permission-mode acceptEdits >> chantier/traces/sortie-etape-$N.log 2>&1
+    borner "$CLAUDE" -p "Utilise le sous-agent \`developpeur\` pour exécuter l'étape $N du chantier décrit dans TODO.md. Lis d'abord chantier/CONVENTIONS.md." \
+        --settings "$REGLAGES" --permission-mode acceptEdits >> chantier/traces/sortie-etape-$N.log 2>&1
 
     # 3. Les gardes
     if ! sh chantier/gardes.sh "$N" > chantier/traces/gardes-etape-$N.log 2>&1; then
@@ -73,10 +98,10 @@ while [ "$N" -le "$FIN" ]; do
     [ "$ETAT" = "OK" ] || arret "$N" "$ETAT — $RAISON"
 
     # 5. Le plan, puis la documentation
-    "$CLAUDE" -p "Utilise le sous-agent \`todo\` pour constater l'état de l'étape $N et mettre TODO.md d'aplomb." \
-        --permission-mode acceptEdits >> chantier/traces/sortie-etape-$N.log 2>&1
-    "$CLAUDE" -p "Utilise le sous-agent \`documenter\` après le travail de l'étape $N du chantier." \
-        --permission-mode acceptEdits >> chantier/traces/sortie-etape-$N.log 2>&1
+    borner "$CLAUDE" -p "Utilise le sous-agent \`todo\` pour constater l'état de l'étape $N et mettre TODO.md d'aplomb." \
+        --settings "$REGLAGES" --permission-mode acceptEdits >> chantier/traces/sortie-etape-$N.log 2>&1
+    borner "$CLAUDE" -p "Utilise le sous-agent \`documenter\` après le travail de l'étape $N du chantier." \
+        --settings "$REGLAGES" --permission-mode acceptEdits >> chantier/traces/sortie-etape-$N.log 2>&1
 
     # 6. Reconstat, puis on grave
     if ! sh chantier/gardes.sh "$N" > chantier/traces/gardes-etape-$N-apres.log 2>&1; then
