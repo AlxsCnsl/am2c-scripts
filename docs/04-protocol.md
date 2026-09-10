@@ -1,56 +1,57 @@
-# 4. `protocol.py` — la grammaire des trames
+# 4. `protocol.py` — l'enveloppe des trames
 
-Fichier : [serie/dcon/protocol.py](../serie/dcon/protocol.py) — 75 lignes.
+Fichier : [serie/dcon/protocol.py](../serie/dcon/protocol.py) — 57 lignes.
 
-**Rôle :** fabriquer les chaînes à envoyer, et vérifier celles qui reviennent.
-Ce fichier ne fait **aucune entrée/sortie** : il ne manipule que des chaînes de
-caractères. On peut donc l'essayer entièrement sans matériel branché.
+**Rôle :** habiller une commande déjà écrite (checksum, terminateur) et
+vérifier une réponse déjà reçue (checksum, accusé). Ce fichier ne fait
+**aucune entrée/sortie** : il ne manipule que des chaînes de caractères. On
+peut donc l'essayer entièrement sans matériel branché.
 
-## Le protocole ADAM en cinq lignes
+Il ne sait en revanche **rien de la forme d'une requête** : ni le préfixe
+(`#`, `$`, `%`…), ni l'adresse, ni le slot. Cette partie-là — « comment on
+pose la question » — appartient à la famille de matériel et vit dans le
+paquet `familles` (voir [13-familles.md](13-familles.md)) ; `protocol.py` se
+contente de dresser et de contrôler la chaîne qu'on lui donne, quelle que
+soit sa forme.
 
-Advantech utilise un protocole ASCII lisible à l'œil nu. Une trame est une
-courte chaîne terminée par un retour chariot `\r` (code 13).
+## L'enveloppe DCON en deux lignes
+
+Le protocole ASCII Advantech/DCON est lisible à l'œil nu. Une trame est une
+courte chaîne terminée par un retour chariot `\r` (code 13) :
 
 ```
-Requête analogique  : #<adresse>S<slot>[<checksum>]<CR>
-Réponse             : ><charge utile>[<checksum>]<CR>
-Requête tout ou rien: $<adresse>S<slot>6[<checksum>]<CR>
-Réponse             : !<charge utile>[<checksum>]<CR>
-Configuration       : %<champs>[<checksum>]<CR>
-Réponse             : !<adresse>[<checksum>]<CR>
-Refus (n'importe quand) : ?<adresse><CR>
+Requête  : <corps>[<checksum>]<CR>
+Réponse  : <accusé><charge utile>[<checksum>]<CR>
 ```
 
-Le premier caractère de la réponse est l'**accusé** : `>` ou `!` = accepté,
-`?` = compris mais refusé. Un `?` n'est donc pas un échec de communication :
-c'est la preuve que le module t'entend. C'est une information précieuse au
-diagnostic.
+Le premier caractère de la réponse est l'**accusé** : `>` pour une lecture de
+valeurs, `!` pour un état ou une configuration acceptée, `?` = compris mais
+refusé. Un `?` n'est donc pas un échec de communication : c'est la preuve que
+le module t'entend. C'est une information précieuse au diagnostic.
+
+Exemples concrets (le contenu du `<corps>` vient du paquet `familles`, voir
+[13-familles.md](13-familles.md)) :
+
+```
+#01S0[07]<CR>         requête de lecture analogique, avec sa checksum
+>+000123[8F]<CR>      réponse acceptée
+$01S06[40]<CR>        requête de lecture tout ou rien
+!01FF00[..]<CR>       réponse acceptée, accusée par '!'
+?01<CR>                refus, quelle que soit la requête posée
+```
 
 ## Les constantes
 
 ```python
 TERMINATOR = "\r"
-ACK = ">"                    # accusé d'une lecture analogique
-CONFIG_ACK = "!"             # accusé d'une config ET d'une lecture 5050
+ACK = ">"                    # accusé d'une lecture de valeurs
+CONFIG_ACK = "!"             # accusé d'un état ET d'une configuration acceptée
 DEFAULT_ADDRESS = "01"       # adresse d'usine d'un module neuf
-ENABLE_CHECKSUM = "%01000840"
 ```
 
-`ENABLE_CHECKSUM` se décompose selon la notation Advantech `%AANNCCFF` :
-
-| Morceau | Valeur | Sens |
-|---|---|---|
-| `%` | | commande de configuration |
-| `AA` | `01` | adresse actuelle du module |
-| `NN` | `00` | nouvelle adresse (ici : champ suivant, laissé à 00) |
-| `CC` | `08` | code de vitesse — `08` = **38400 bauds** |
-| `FF` | `40` | format de données ; le bit 6 à 1 (0x40) active la checksum |
-
-⚠️ **Cette trame reconfigure aussi la vitesse à 38400**, quelle que soit la
-vitesse à laquelle tu parlais au module. Le lanceur `lancer_adam.sh` le dit
-explicitement à l'utilisateur avant de confirmer. Ne recompose ces champs
-qu'avec la documentation du module sous les yeux ; l'option `--config-command`
-existe précisément pour envoyer une autre trame sans toucher au code.
+`DEFAULT_ADDRESS` reste ici bien qu'il ne serve qu'à composer des requêtes
+(dans `familles.py` et `settings.py`) : c'est une valeur d'usine du
+matériel DCON en général, pas une particularité de l'ADAM-5000.
 
 ## Les fonctions
 
@@ -85,24 +86,6 @@ Habille une commande : nettoyage, majuscules, somme éventuelle, terminateur.
 
 Noter que la somme est calculée **sur le corps déjà mis en majuscules**, donc
 cohérente avec ce qui part réellement sur le fil.
-
-### `read_command(address="01", slot=0)` → `#01S0`
-
-Rend la commande **nue**, sans somme ni terminateur. Utile à deux endroits :
-`diagnostic.probes()`, qui décide lui-même de l'habillage à essayer, et
-`cli.show_raw()`, qui affiche la requête avant de l'envoyer.
-
-### `build_command(address="01", slot=0, checksum=True)` → `#01S007\r`
-
-Le raccourci : `build_frame(read_command(...))`. C'est ce qu'appelle
-`Monitor.request()` à chaque cycle.
-
-### `digital_read_command(address="01", slot=0)` → `$01S06`
-
-La lecture d'un ADAM-5050. Deux différences avec la lecture analogique :
-le préfixe `$` au lieu de `#`, et un `6` final imposé par la documentation
-(c'est le code de la fonction « lire l'image des E/S »). Et sa réponse est
-accusée par `!`, pas par `>` — d'où le paramètre `ack` de `verify_frame()`.
 
 ### `verify_frame(response, checksum=True, ack=ACK)`
 

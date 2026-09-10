@@ -17,7 +17,7 @@ nouvel arbitrage : les seules cases qui attendent une main humaine sont marquée
 |---|---|---|
 | 1 — Poser le filet de tests | faite | 6/6 |
 | 2 — Renommage `dcon` / `serie/` | faite | 6/6 |
-| 3 — Rendre `protocol.py` générique | à faire | 0/4 |
+| 3 — Rendre `protocol.py` générique | faite | 4/4 |
 | 4 — Familles et registre de modules | à faire | 0/11 |
 | 5 — Un seul `Monitor` | à faire | 0/7 |
 | 6 — Découper `cli.py` | à faire | 0/9 |
@@ -157,15 +157,15 @@ Aujourd'hui `protocol.py` prétend être « indépendant du module d'E/S » mais
 contient `#<addr>S<slot>` et `$<addr>S<slot>6`, qui sont la grammaire du fond de
 panier ADAM-5000. Un ADAM-4000 ou un I-7000 lit par `#<addr>`, sans slot.
 
-- [ ] Garder dans `protocol.py` uniquement ce qui est vrai pour toute la famille
+- [x] Garder dans `protocol.py` uniquement ce qui est vrai pour toute la famille
       ASCII Advantech/DCON : `TERMINATOR`, `ACK`, `CONFIG_ACK`, `checksum_ascii`,
       `build_frame`, `verify_frame`, `DEFAULT_ADDRESS`.
-- [ ] Déplacer `read_command`, `digital_read_command` et `ENABLE_CHECKSUM` vers
+- [x] Déplacer `read_command`, `digital_read_command` et `ENABLE_CHECKSUM` vers
       les familles (étape 4).
-- [ ] Mettre à jour l'en-tête du fichier : il documente une grammaire
+- [x] Mettre à jour l'en-tête du fichier : il documente une grammaire
       d'enveloppe, pas un jeu de commandes.
 
-- [ ] **Fin d'étape :** aucune mention de « slot » ni de référence de module dans
+- [x] **Fin d'étape :** aucune mention de « slot » ni de référence de module dans
       `protocol.py` ; la suite de tests passe toujours.
 
 ---

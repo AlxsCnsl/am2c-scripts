@@ -139,7 +139,8 @@ matériel :
 
 | Fichier | Couche testée | Ce qu'il vérifie |
 |---|---|---|
-| `test_protocol.py` | [`protocol.py`](04-protocol.md) | `checksum_ascii`, `build_frame`, les constructeurs de commande (`read_command`, `digital_read_command`, `build_command`), `verify_frame` |
+| `test_protocol.py` | [`protocol.py`](04-protocol.md) | `checksum_ascii`, `build_frame`, `verify_frame` |
+| `test_familles.py` | [`familles`](13-familles.md) | les constructeurs de commande (`read_command`, `digital_read_command`, `build_command`), `ENABLE_CHECKSUM` |
 | `test_modules.py` | [`modules.py`](05-modules.md) | `parse_5081`, `parse_5050`, `possible_layouts`, et les constantes du module |
 | `test_settings.py` | [`settings.py`](12-settings.md) | `parse()` (document déjà décodé) et `load()` (lecture du fichier, y compris son absence) |
 

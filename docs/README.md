@@ -22,6 +22,7 @@ mesure.
 | 10 | [10-relecture.md](10-relecture.md) | Relecture critique : anomalies trouvées et corrections proposées |
 | 11 | [11-glossaire.md](11-glossaire.md) | Vocabulaire : baud, trame, checksum, slot, DTR… |
 | 12 | [12-settings.md](12-settings.md) | Décrire le rack dans un fichier JSON, lu par `--config` |
+| 13 | [13-familles.md](13-familles.md) | La grammaire de requête propre à l'ADAM-5000 (adresse, slot, activation checksum) |
 
 ## En une phrase
 

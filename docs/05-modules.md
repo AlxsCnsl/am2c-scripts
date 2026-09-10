@@ -159,8 +159,9 @@ d'une voie à l'autre coupe très probablement les champs au mauvais endroit.
 C'est le scénario prévu par l'architecture :
 
 1. Écrire `parse_5017(payload, ...)` **ici**, sur le modèle des deux autres.
-2. Si sa requête ou son accusé diffèrent, ajouter la commande dans
-   `protocol.py`.
+2. Si sa requête diffère, ajouter la commande dans le paquet `familles`
+   ([13-familles.md](13-familles.md)) ; si son accusé diffère, c'est
+   `protocol.py` qu'il faut regarder.
 3. Si sa boucle diffère, ajouter une sous-classe de `Monitor` comme
    `Monitor5050`.
 4. Brancher l'option dans `cli.parse_args()` et `cli.main()`.

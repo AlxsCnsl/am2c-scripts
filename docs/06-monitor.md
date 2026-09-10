@@ -62,7 +62,7 @@ with monitor:
 
 ```python
 def request(self):
-    return protocol.build_command(self.address, self.slot, self.checksum)
+    return familles.build_command(self.address, self.slot, self.checksum)
 
 def decode(self, response):
     payload = protocol.verify_frame(response, self.checksum)
@@ -158,7 +158,7 @@ class Monitor5050(Monitor):
         super().__init__(port, slot=slot, channels=IO_CHANNELS, **kwargs)
 
     def request(self):
-        command = protocol.digital_read_command(self.address, self.slot)
+        command = familles.digital_read_command(self.address, self.slot)
         return protocol.build_frame(command, self.checksum)
 
     def decode(self, response):

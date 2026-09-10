@@ -30,7 +30,7 @@ Malgré son nom de fichier, cette fonction n'est pas réservée à la configurat
 **Noter le défaut `checksum=False`**, à l'inverse du reste du paquet. Explication
 juste en dessous.
 
-## `enable_checksum(port, command=ENABLE_CHECKSUM, response_timeout=2.0, baud=DEFAULT_BAUD)`
+## `enable_checksum(port, command=familles.ENABLE_CHECKSUM, response_timeout=2.0, baud=DEFAULT_BAUD)`
 
 ```python
 response = send_once(port, command, checksum=False,

@@ -77,7 +77,7 @@ __main__.py
                       └─ .cycle()       jusqu'à 5 tentatives
                            └─ .read_once()
                                 ├─ .request()
-                                │    └─ protocol.digital_read_command()  → "$01S06"
+                                │    └─ familles.digital_read_command()  → "$01S06"
                                 │    └─ protocol.build_frame()           → "$01S06\r"
                                 ├─ serial.write("$01S06\r")     couche 1 → le câble
                                 ├─ serial.read_frame(2.0)       couche 1 ← le câble
